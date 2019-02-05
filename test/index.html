@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>FigureGallery - Test</title>
+
+        <link rel="stylesheet" href="../fig-gallery.css">
+
+        <script src="../fig-gallery.js" defer></script>
+    </head>
+    <body>
+        <div id="gallery-1" class="gallery">
+            <figure>
+                <img src="https://via.placeholder.com/2000.png">
+
+                <figcaption>
+                    <h1>Test 1</h1>
+                    <p>Lorem ipsum dolor sit amet</p>
+                </figcaption>
+            </figure>
+
+            <figure class="current">
+                <img src="https://via.placeholder.com/600.png">
+
+                <figcaption>
+                    <h1>Test 2</h1>
+                    <p>Lorem ipsum dolor sit amet</p>
+                </figcaption>
+            </figure>
+
+            <figure>
+                <img src="https://via.placeholder.com/300.png">
+
+                <figcaption>
+                    <h1>Test 3</h1>
+                    <p>Lorem ipsum dolor sit amet</p>
+                </figcaption>
+            </figure>
+        </div>
+
+        <script src="../fig-gallery.js"></script>
+        <script>
+            var gallery = new FigureGallery({
+                container: document.getElementById('gallery-1')
+            });
+        </script>
+    </body>
+</html>
