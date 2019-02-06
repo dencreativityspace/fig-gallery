@@ -227,7 +227,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
      * @return  {this}
     */
     this.prev = (cycleState = cycle) => {
-        setItem(figures[keepInBound(getItemIndex(current) - 1, cycleState)]);
+        navigateOverlayFigure(-1, cycleState);
 
         return this;
     };
@@ -240,7 +240,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
      * @return  {this}
     */
     this.next = (cycleState = cycle) => {
-        setItem(figures[keepInBound(getItemIndex(current) + 1, cycleState)]);
+        navigateOverlayFigure(1, cycleState);
 
         return this;
     };
@@ -255,15 +255,36 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
      * @return  {this}
     */
     this.set = (figure) => {
-        if (!figure || !(figure instanceof HTMLElement)) {
-            throw new Error(`L'elemento indicato non è un elemeno DOM valido.`);
+        if (!figure) {
+            throw new Error(`L'elemento indicato non è un valore valido. Inserire un numero intero o un elemento DOM.`);
         }
 
-        if (getItemIndex(figure) < 0) {
-            throw new Error(`L'elemento indicato non fa parte di questa galleria.`);
+        if (typeof figure === 'number') {
+            if (throwsOpenIndexError) {
+                if (figure > figures.length - 1 || Math.abs(figure) > figures.length - 1) {
+                    throw new Error(`L'oggetto ${figure} non è disponibile.`);
+                }
+            }
+            else {
+                figure = keepInBound(figure);
+            }
+
+            figure = figures[figure];
+        }
+        else if (figure instanceof HTMLElement) {
+            if (getFigureIndex(figure) < 0) {
+                throw new Error(`L'elemento indicato non fa parte di questa galleria.`);
+            }
+        }
+        else {
+            throw new Error(`L'elemento indicato non è un valore valido. Inserire un numero intero o un elemento DOM.`);
         }
 
-        setItem(figure);
+        setCurrentFigure(figure);
+
+        if (that.isOpen()) {
+            updateOverlayFigure();
+        }
 
         return this;
     };
