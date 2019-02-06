@@ -88,8 +88,39 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         }
     })();
 
-    function setImageSize(image) {
-        console.log(image);
+    const eventCallbacks = {
+        containerClick: (e) => {
+            if (!that.isOpen()) {
+                that.open(null);
+            }
+        },
+        keyboardNavigation: (e) => {
+            if (that.isOpen()) {
+                const key = e.which || e.keyCode || 0;
+
+                switch (key) {
+                    case 27: // Esc
+                        this.close();
+                        break;
+                    case 37: // Left arrow
+                        this.prev();
+                        break;
+                    case 39: // Right arrow
+                        this.next();
+                        break;
+                    case 36: // Home
+                        this.open(0);
+                        break;
+                    case 35: // End
+                        this.open(-1);
+                        break;
+                }
+            }
+        },
+        resize: () => {
+            setImageSize(overlay.getImage())
+        }
+    }
 
     // Private methods
     // Keeps `figures` index in bound.
