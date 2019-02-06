@@ -1,4 +1,4 @@
-function FigureGallery({container = '#gallery', openSelector = '.open', currentSelector = '.current', buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, throwsOpenIndexError = false}) {
+function FigureGallery({container = '#gallery', openSelector = '.open', currentSelector = '.current', buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false}) {
     // Type-checks
     if (typeof contaier === 'string') {
         container = document.querySelector(container);
@@ -307,12 +307,22 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         return this;
     };
 
-    for (const type of Object.keys(overlay.buttons)) {
-        overlay.buttons[type].addEventListener('click', (e) => {
-            e.stopImmediatePropagation();
+    /**
+     * Sets the gallery to be openable or not.
+     *
+     * @param   {boolean}   val
+     *
+     * @return  {this}
+    */
+    this.setOpenable = (val) => {
+        if (typeof val !== 'boolean') {
+            throw new Error('Il valore deve essere di tipo booleano');
+        }
 
-            that[type]();
-        }, false);
+        openable = val;
+        setListeners(val);
+
+        return this;
     }
 
     /**
@@ -323,6 +333,16 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
     this.isOpen = () => {
         return container.classList.contains(openClass);
     }
+
+    /**
+     * Tells if the the overlay is able to be open or not.
+     *
+     * @return  {boolean}
+    */
+    this.isOpenable = () => {
+        return openable;
+    }
+
     /**
      * Returns the current figure element.
      *
