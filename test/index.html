@@ -10,7 +10,7 @@
     <body>
         <div id="gallery-1" class="gallery">
             <figure>
-                <img src="https://via.placeholder.com/2000.png">
+                <img src="images/2000.png">
 
                 <figcaption>
                     <h1>Test 1</h1>
@@ -19,7 +19,7 @@
             </figure>
 
             <figure class="current">
-                <img src="https://via.placeholder.com/600.png">
+                <img src="images/600.png">
 
                 <figcaption>
                     <h1>Test 2</h1>
@@ -28,7 +28,7 @@
             </figure>
 
             <figure>
-                <img src="https://via.placeholder.com/300.png">
+                <img src="images/300.png">
 
                 <figcaption>
                     <h1>Test 3</h1>
@@ -40,7 +40,8 @@
         <script src="../fig-gallery.js"></script>
         <script>
             var gallery = new FigureGallery({
-                container: document.getElementById('gallery-1')
+                container: document.getElementById('gallery-1'),
+                openable: false
             });
         </script>
     </body>
