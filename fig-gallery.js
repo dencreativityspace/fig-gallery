@@ -323,4 +323,12 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
     this.isOpen = () => {
         return container.classList.contains(openClass);
     }
+    /**
+     * Returns the current figure element.
+     *
+     * @return  {HTMLElement}
+    */
+    this.getCurrentFigure = () => {
+        return current;
+    }
 }
