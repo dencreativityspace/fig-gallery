@@ -72,8 +72,8 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         }
 
         // Utility to get the image of the current figure
-        dialog.getImage = function () {
-            return dialog.content.querySelector('img');
+        dialog.getContent = function () {
+            return dialog.content.querySelector('img, video');
         }
 
         return dialog;
@@ -118,7 +118,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
             }
         },
         resize: () => {
-            setImageSize(overlay.getImage())
+            setContentSize()
         }
     }
 
@@ -130,10 +130,48 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
 
     // Sets the maximum image size.
     function setImageSize(image) {
-        const ratio = Math.min(1, overlay.content.clientWidth / image.naturalWidth, overlay.content.clientHeight / image.naturalHeight);
+        if (overlay) {
+            const overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
 
-        image.style.width = (image.naturalWidth * ratio) + 'px';
-        image.style.height = (image.naturalHeight * ratio) + 'px';
+            const ratio = Math.min(
+                1,
+                (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / image.naturalWidth,
+                (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / image.naturalHeight
+            );
+
+            image.style.width = (image.naturalWidth * ratio) + 'px';
+            image.style.height = (image.naturalHeight * ratio) + 'px';
+        }
+    }
+
+    // Sets the maximum video size.
+    function setVideoSize(video) {
+        if (overlay) {
+            const overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
+
+            const ratio = Math.min(
+                1,
+                (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / video.videoWidth,
+                (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / video.videoHeight
+            );
+
+            video.style.width = (video.videoWidth * ratio) + 'px';
+            video.style.height = (video.videoHeight * ratio) + 'px';
+        }
+    }
+
+    function setContentSize() {
+        if (overlay) {
+            const content = overlay.getContent();
+            switch (content.tagName) {
+                case 'IMG':
+                    setImageSize(content);
+                    break;
+                case 'VIDEO':
+                    setVideoSize(content);
+                    break;
+            }
+        }
     }
 
     // Gets the index of the given figure.
@@ -167,7 +205,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         overlay.content.innerHTML = '';
         overlay.content.appendChild(figureClone);
 
-        setImageSize(overlay.getImage());
+        setContentSize();
     }
 
     function navigateOverlayFigure(dir = 1, cycleState = cycle) {
