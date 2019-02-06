@@ -35,10 +35,11 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
     // Maps initial figures
     const figures = container.querySelectorAll('figure');
 
+    // Caches the overlay when removed.
+    let dialogCache = null;
+
     // Sets default overlay
     let overlay = createOverlay();
-
-    let dialogCache = null;
 
     // Takes the current image.
     let current = (() => {
