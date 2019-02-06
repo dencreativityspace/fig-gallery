@@ -1,4 +1,5 @@
 function FigureGallery({container = '#gallery', openSelector = '.open', currentSelector = '.current', buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, throwsOpenIndexError = false}) {
+    // Type-checks
     if (typeof contaier === 'string') {
         container = document.querySelector(container);
     }
@@ -7,14 +8,16 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         throw new Error('Il contenitore della galleria deve essere un elemento valido.');
     }
 
+    // Shorthand to easily reach `this`.
     const that = this;
 
+    // Overlaps custom settings to default ones:
     buttonSelectors = Object.assign({ close: '.close', prev: '.prev', next: '.next' }, buttonSelectors);
     buttonContents = Object.assign({ close: '&times;', prev: '&lang;', next: '&rang;' }, buttonContents);
 
     overlaySelectors = Object.assign({ overlay: '.overlay', content: '.overlay-content' }, overlaySelectors);
 
-
+    // Class mapping:
     const openClass = openSelector.substr(1);
     const currentClass = currentSelector.substr(1);
 
@@ -29,12 +32,16 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         content: overlaySelectors.content.substr(1)
     }
 
+    // Maps initial figures
     const figures = container.querySelectorAll('figure');
 
+    // Sets default overlay
     let overlay = (() => {
+        // Takes interval if already exists
         let dialog = container.querySelector('.overlay');
 
         if (!dialog) {
+            // Initalizes overlay
             dialog = document.createElement((HTMLDialogElement) ? 'dialog' : 'div');
             dialog.classList.add(overlayClasses.overlay);
 
@@ -46,6 +53,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
             container.appendChild(dialog);
         }
 
+        // Takes buttons or creates them
         dialog.buttons = {};
 
         for (const type in buttonSelectors) {
@@ -63,6 +71,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
             dialog.buttons[type] = button;
         }
 
+        // Utility to get the image of the current figure
         dialog.getImage = function () {
             return dialog.content.querySelector('img');
         }
@@ -70,6 +79,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         return dialog;
     })();
 
+    // Takes the current image
     let current = (() => {
         for (const figure of figures) {
             if (figure.classList.contains(currentClass)) {
@@ -162,7 +172,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         };
     }
 
-    window.addEventListener('resize', setOverlayImageSize(overlay));
+    // Public methods
     overlay.content.addEventListener('resize', setOverlayImageSize(overlay));
 
     this.open = (item = 0) => {
@@ -187,18 +197,41 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         return this;
     };
 
+    /**
+     * Shows the previous image. If the ovelay is closed, opens it.
+     *
+     * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
+     *
+     * @return  {this}
+    */
     this.prev = (cycleState = cycle) => {
         setItem(figures[keepInBound(getItemIndex(current) - 1, cycleState)]);
 
         return this;
     };
 
+    /**
+     * Shows the next image. If the ovelay is closed, opens it.
+     *
+     * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
+     *
+     * @return  {this}
+    */
     this.next = (cycleState = cycle) => {
         setItem(figures[keepInBound(getItemIndex(current) + 1, cycleState)]);
 
         return this;
     };
 
+    /**
+     * Sets the current figure.
+     *
+     * @param   {number|HTMLElement}   figure   Index of the element or the
+     *                                          element itself to bet setted as
+     *                                          current.
+     *
+     * @return  {this}
+    */
     this.set = (figure) => {
         if (!figure || !(figure instanceof HTMLElement)) {
             throw new Error(`L'elemento indicato non è un elemeno DOM valido.`);
@@ -213,6 +246,11 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         return this;
     };
 
+    /**
+     * Closes the overlay.
+     *
+     * @return  {this}
+    */
     this.close = () => {
         if (HTMLDialogElement && overlay instanceof HTMLDialogElement) {
             overlay.setAttribute('open', false);
@@ -234,6 +272,11 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         }, false);
     }
 
+    /**
+     * Tells if the the overlay is open or not.
+     *
+     * @return  {boolean}
+    */
     this.isOpen = () => {
         return container.classList.contains(openClass);
     }
