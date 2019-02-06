@@ -91,25 +91,39 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
     function setImageSize(image) {
         console.log(image);
 
-        const ratio = Math.min(1, overlay.content.clientWidth / image.naturalWidth, overlay.content.clientHeight / image.naturalHeight);
-
-        overlay.content.width = (image.naturalWidth * ratio) + 'px';
-        overlay.content.height = (image.naturalHeight * ratio) + 'px';
-
-        console.log(ratio);
+    // Private methods
+    // Keeps `figures` index in bound.
+    function keepInBound(index, cycleState = cycle) {
+        return ((cycleState && index < 0) ? (figures.length + index) + figures.length : index) % figures.length;
     }
 
-    function setItem(figure) {
-        if (current) {
+    // Sets the maximum image size.
+    function setImageSize(image) {
+        const ratio = Math.min(1, overlay.content.clientWidth / image.naturalWidth, overlay.content.clientHeight / image.naturalHeight);
+
+        image.style.width = (image.naturalWidth * ratio) + 'px';
+        image.style.height = (image.naturalHeight * ratio) + 'px';
+    }
+
+    // Gets the index of the given figure.
+    function getFigureIndex(figure) {
+        return Array.prototype.indexOf.call(figures, figure);
+    }
+
+    // Sets the current figure.
+    function setCurrentFigure(figure) {
+        if (current != null) {
             current.classList.remove(currentClass);
         }
 
         figure.classList.add(currentClass);
         current = figure;
+    }
 
-        let fig = current.cloneNode(true);
-        let img = fig.querySelector('img');
-
+    // Event Listeners
+    // Updates and opens the overlay.
+    function updateOverlayFigure() {
+        let figureClone = current.cloneNode(true);
         container.classList.add(openClass);
 
         if (HTMLDialogElement && overlay instanceof HTMLDialogElement) {
@@ -119,79 +133,87 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
             overlay.classList.add(openClass);
         }
 
-        for (const child of overlay.content.children) {
-            overlay.content.removeChild(child);
-        }
+        overlay.content.innerHTML = '';
+        overlay.content.appendChild(figureClone);
 
-        overlay.content.appendChild(fig);
-
-        setImageSize(img);
+        setImageSize(overlay.getImage());
     }
 
-    function keepInBound(index, cycleState = cycle) {
-        return ((cycleState && index < 0) ? (figures.length + index) + figures.length : index) % figures.length;
-    }
+    function navigateOverlayFigure(dir = 1, cycleState = cycle) {
+        setCurrentFigure(figures[keepInBound(getFigureIndex(current) + dir, cycleState)]);
 
-    function getItemIndex(item) {
-        return Array.prototype.indexOf.call(figures, item);
-    }
-
-    container.addEventListener('click', (e) => {
-        if (!that.isOpen()) {
-            that.open(null);
-        }
-    }, false);
-
-    document.addEventListener('keydown', (e) => {
         if (that.isOpen()) {
-            const key = e.which || e.keyCode || 0;
+            updateOverlayFigure();
+        }
+    }
 
-            switch (key) {
-                case 27:
-                    this.close();
-                    break;
-                case 37:
-                    this.prev();
-                    break;
-                case 39:
-                    this.next();
-                    break;
-                case 36:
-                    this.open(0);
-                    break;
-                case 35:
-                    this.open(-1);
-                    break;
+    const setListeners = (function setListenersFn(op) {
+        if (op == null || typeof op !== 'boolean') {
+            throw new Error('Il valore deve essere di tipo booleano.');
+        }
+
+        if (op) {
+            if (openable) {
+                // Click on the gallery
+                container.addEventListener('click', eventCallbacks.containerClick, false);
+
+                // Keyboard navigation
+                document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
+
+                window.addEventListener('resize', eventCallbacks.resize);
             }
         }
-    });
+        else {
+            container.removeEventListener('click', eventCallbacks.containerClick, false);
 
-    const setOverlayImageSize = (overlay) => {
-        return () => {
-            setImageSize(overlay.content.querySelector('img'));
-        };
+            document.removeEventListener('keydown', eventCallbacks.keyboardNavigation);
+
+            window.removeEventListener('resize', eventCallbacks.resize);
+        }
+
+        return setListenersFn;
+    })(openable);
+
+
+    // Binds the overlay buttons to the public methods
+    for (const type of Object.keys(overlay.buttons)) {
+        overlay.buttons[type].addEventListener('click', (e) => {
+            e.stopImmediatePropagation();
+
+            that[type]();
+        }, false);
     }
 
     // Public methods
-    overlay.content.addEventListener('resize', setOverlayImageSize(overlay));
 
-    this.open = (item = 0) => {
-        if (item == null) {
-            item = getItemIndex(current);
+    /**
+     * Opens the overlay to show the image with the given index.
+     *
+     * @param   {?number}   [index=0]   Index of the element to be shown.
+     *                                  If is null gets the current figure.
+     *
+     * @return  {this}
+    */
+    this.open = (index = 0) => {
+        if (index == null) {
+            index = getFigureIndex(current);
         }
         else {
+            index = parseInt(index);
+
             if (throwsOpenIndexError) {
-                if (item > figures.length - 1 || Math.abs(item) > figures.length - 1) {
-                    throw new Error(`L'oggetto ${item} non è disponibile.`);
+                if (index > figures.length - 1 || Math.abs(index) > figures.length - 1) {
+                    throw new Error(`L'oggetto ${index} non è disponibile.`);
                 }
             }
             else {
-                item = keepInBound(item);
+                index = keepInBound(index);
             }
         }
 
-        if (!that.isOpen() || figures[item] !== current) {
-            setItem(figures[item]);
+        if (!that.isOpen() || figures[index] !== current) {
+            setCurrentFigure(figures[index]);
+            updateOverlayFigure();
         }
 
         return this;
