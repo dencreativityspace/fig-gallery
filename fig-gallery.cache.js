@@ -411,11 +411,13 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
      * @return  {this}
     */
     this.close = () => {
-        if (HTMLDialogElement && overlay instanceof HTMLDialogElement) {
-            overlay.setAttribute('open', false);
-        }
-        else {
-            overlay.classList.remove(openClass);
+        if (overlay) {
+            if (HTMLDialogElement && overlay instanceof HTMLDialogElement) {
+                overlay.setAttribute('open', false);
+            }
+            else {
+                overlay.classList.remove(openClass);
+            }
         }
 
         container.classList.remove(openClass);
@@ -437,7 +439,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
 
         openable = val;
 
-        if (!val) {
+        if (!val && overlay) {
             container.removeChild(overlay);
         }
 
