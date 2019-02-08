@@ -147,11 +147,11 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
             }
 
             // Takes interval if already exists
-            let dialog = container.querySelector('.overlay');
+            let dialog = container.querySelector(overlaySelectors.overlay);
 
             if (!dialog) {
                 // Initalizes overlay
-                dialog = document.createElement((HTMLDialogElement) ? 'dialog' : 'div');
+                dialog = document.createElement(('HTMLDialogElement' in window) ? 'dialog' : 'div');
                 dialog.classList.add(overlayClasses.overlay);
 
                 dialog.content = document.createElement('div');
@@ -213,7 +213,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         container.classList.add(openClass);
 
         if (overlay) {
-            if (HTMLDialogElement && overlay instanceof HTMLDialogElement) {
+            if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
                 overlay.setAttribute('open', true);
             }
             else {
@@ -412,7 +412,7 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
     */
     this.close = () => {
         if (overlay) {
-            if (HTMLDialogElement && overlay instanceof HTMLDialogElement) {
+            if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
                 overlay.setAttribute('open', false);
             }
             else {
