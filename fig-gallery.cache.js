@@ -140,13 +140,16 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     function setContentSize() {
         if (overlay) {
             const content = overlay.getContent();
-            switch (content.tagName) {
-                case 'IMG':
-                    setImageSize(content);
-                    break;
-                case 'VIDEO':
-                    setVideoSize(content);
-                    break;
+
+            if (content) {
+                switch (content.tagName) {
+                    case 'IMG':
+                        setImageSize(content);
+                        break;
+                    case 'VIDEO':
+                        setVideoSize(content);
+                        break;
+                }
             }
         }
     }
