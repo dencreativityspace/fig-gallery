@@ -484,6 +484,26 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     }
 
     /**
+     * Forces the update of the child list.
+     * Useful when browser doesn't support MutationObserver.
+     *
+     * @return  {this}
+    */
+    this.updateFigures = () => {
+        figures = contaier.querySelctorAll('figure');
+
+        figures.forEach((figure) => {
+            figure.addEventListener('click', eventCallbacks.figureClick, false);
+        });
+
+        if (!(current in figures)) {
+            current = figures[0] || null;
+        }
+
+        return this;
+    };
+
+    /**
      * Tells if the the overlay is open or not.
      *
      * @return  {boolean}
