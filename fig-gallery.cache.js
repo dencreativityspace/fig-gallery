@@ -40,7 +40,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     }
 
     // Maps initial figures.
-    const figures = container.querySelectorAll('figure');
+    let figures = container.querySelectorAll('figure');
 
     // Caches the overlay when removed.
     let dialogCache = null;
@@ -55,6 +55,8 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 return figure;
             }
         }
+
+        return figures[0] || null;
     })();
 
     // Stores the callbacks for the events.
@@ -358,6 +360,27 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         return setListenersFn;
     })(openable);
 
+    // Creates the MutationObserver if supported.
+    if ('MutationObserver' in window) {
+        const mutation = new MutationObserver((mutations, observer) => {
+            mutations.forEach((mut) => {
+                if (mut.type === 'childList') {
+                    figures = container.querySelectorAll('figure');
+
+                    figures.forEach((figure) => {
+                        figure.addEventListener('click', eventCallbacks.figureClick, false);
+                    });
+
+                    if (mutation.removedNodes && current in mutation.removedNodes.values()) {
+                        current = figures[0] || null;
+                    }
+                }
+            });
+        });
+
+        mutation.observe(container, { childList: true });
+    }
+
     // Public methods
 
     /**
@@ -386,8 +409,13 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
 
         if (!that.isOpen() || figures[index] !== current) {
-            setCurrentFigure(figures[index]);
-            updateOverlayFigure();
+            if (figures.length > 0 || index <= figures.length || current == null) {
+                setCurrentFigure(figures[0]);
+            }
+
+            if (current != null) {
+                updateOverlayFigure();
+            }
         }
 
         return this;
@@ -497,15 +525,31 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
         openable = val;
 
-        if (!val && overlay) {
-            container.removeChild(overlay);
+        if (val) {
+            overlay = createOverlay();
+
+            if ('MutationObserver' in window && mutation) {
+                mutation.observe(container, { childList: true });
+            }
+        }
+        else {
+            if ('MutationObserver' in window && mutation) {
+                mutation.disconnect();
+            }
+
+            if (overlay) {
+                container.removeChild(overlay);
+            }
         }
 
-        overlay = createOverlay();
+
+        overlay = null;
         setListeners(val);
 
         return this;
+    };
     }
+
 
     /**
      * Tells if the the overlay is open or not.
@@ -514,7 +558,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     */
     this.isOpen = () => {
         return container.classList.contains(openClass);
-    }
+    };
 
     /**
      * Tells if the the overlay is able to be open or not.
@@ -523,7 +567,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     */
     this.isOpenable = () => {
         return openable;
-    }
+    };
 
     /**
      * Returns the current figure element.
@@ -532,5 +576,5 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     */
     this.getCurrentFigure = () => {
         return current;
-    }
+    };
 }
