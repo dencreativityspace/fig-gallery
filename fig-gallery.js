@@ -242,20 +242,20 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let figureClone = current.cloneNode(true);
         container.classList.add(openClass);
 
-        if (!that.isOpen()) {
-            if (overlay) {
-                if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
+        if (overlay) {
+            if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
+                if (!overlay.open) {
                     overlay.showModal();
                 }
-                else {
-                    overlay.classList.add(openClass);
-                }
-
-                overlay.content.innerHTML = '';
-                overlay.content.appendChild(figureClone);
-
-                setContentSize();
             }
+            else {
+                overlay.classList.add(openClass);
+            }
+
+            overlay.content.innerHTML = '';
+            overlay.content.appendChild(figureClone);
+
+            setContentSize();
         }
     }
 
@@ -423,17 +423,15 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
     */
     this.close = () => {
-        if (that.isOpen()) {
-            if (overlay) {
-                if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
+        if (overlay) {
+            if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
+                if (overlay.open) {
                     overlay.close();
                 }
-                else {
-                    overlay.classList.remove(openClass);
-                }
             }
-
-            container.classList.remove(openClass);
+            else {
+                overlay.classList.remove(openClass);
+            }
         }
 
         return this;
