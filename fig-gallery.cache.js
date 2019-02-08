@@ -142,21 +142,26 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         if (overlay) {
             const overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
 
-            if (!embed.hasAttribute('data-width') || !embed.hasAttribute('data-height')) {
+            if (
+                !embed.hasAttribute('data-width') || !embed.hasAttribute('data-height') ||
+                embed.width > parseInt(embed.getAttribute('data-width')) || embed.height > parseInt(embed.getAttribute('data-height'))
+            ) {
                 embed.setAttribute('data-width', embed.width);
                 embed.setAttribute('data-height', embed.height);
             }
 
-            embed.width = embed.getAttribute('data-width');
-            embed.height = embed.getAttribute('data-height');
+            embed.width = parseInt(embed.getAttribute('data-width'));
+            embed.height = parseInt(embed.getAttribute('data-height'));
 
             const ratio = Math.min(
                 (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / embed.width,
-                (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.weight
+                (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.height
             );
 
-            embed.width = (embed.width * ratio) + 'px';
-            embed.height = (embed.height * ratio) + 'px';
+            console.log(ratio);
+
+            embed.width = parseInt(embed.width * ratio);
+            embed.height = parseInt(embed.height * ratio);
         }
     }
 
@@ -173,7 +178,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                         setVideoSize(content);
                         break;
                     case 'EMBED':
-                    case 'VIDEO':
+                    case 'IFRAME':
                     case 'OBJECT':
                         setEmbedSize(content);
                 }
@@ -221,7 +226,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 dialog.buttons[type] = button;
             }
 
-            // Utility to get the image of the current figure.
+            // Utility to get the content of the current figure.
             dialog.getContent = function () {
                 return dialog.content.querySelector('img, video, object, embed, iframe');
             }
