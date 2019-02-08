@@ -255,18 +255,20 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let figureClone = current.cloneNode(true);
         container.classList.add(openClass);
 
-        if (overlay) {
-            if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
-                overlay.setAttribute('open', true);
-            }
-            else {
-                overlay.classList.add(openClass);
-            }
+        if (!that.isOpen()) {
+            if (overlay) {
+                if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
+                    overlay.showModal();
+                }
+                else {
+                    overlay.classList.add(openClass);
+                }
 
-            overlay.content.innerHTML = '';
-            overlay.content.appendChild(figureClone);
+                overlay.content.innerHTML = '';
+                overlay.content.appendChild(figureClone);
 
-            setContentSize();
+                setContentSize();
+            }
         }
     }
 
@@ -462,16 +464,18 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
     */
     this.close = () => {
-        if (overlay) {
-            if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
-                overlay.setAttribute('open', false);
+        if (that.isOpen()) {
+            if (overlay) {
+                if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
+                    overlay.close();
+                }
+                else {
+                    overlay.classList.remove(openClass);
+                }
             }
-            else {
-                overlay.classList.remove(openClass);
-            }
-        }
 
-        container.classList.remove(openClass);
+            container.classList.remove(openClass);
+        }
 
         return this;
     };
