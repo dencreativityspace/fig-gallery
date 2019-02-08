@@ -1,4 +1,4 @@
-function FigureGallery({container = '#gallery', openSelector = '.open', currentSelector = '.current', buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false}) {
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false}) {
     // Type-checks
     if (typeof contaier === 'string') {
         container = document.querySelector(container);
@@ -18,6 +18,8 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
     overlaySelectors = Object.assign({ overlay: '.overlay', content: '.overlay-content' }, overlaySelectors);
 
     // Class mapping:
+    const galleryClass = gallerySelector.substr(1);
+
     const openClass = openSelector.substr(1);
     const currentClass = currentSelector.substr(1);
 
@@ -32,13 +34,18 @@ function FigureGallery({container = '#gallery', openSelector = '.open', currentS
         content: overlaySelectors.content.substr(1)
     }
 
-    // Maps initial figures
+    // Sets the gallery class.
+    if (!container.classList.contains(galleryClass)) {
+        container.classList.add(galleryClass);
+    }
+
+    // Maps initial figures.
     const figures = container.querySelectorAll('figure');
 
     // Caches the overlay when removed.
     let dialogCache = null;
 
-    // Sets default overlay
+    // Sets default overlay.
     let overlay = createOverlay();
 
     // Takes the current image.
