@@ -59,10 +59,16 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
     // Stores the callbacks for the events.
     const eventCallbacks = {
-        containerClick: (e) => {
+        containerClick: () => {
             if (!that.isOpen()) {
                 that.open(null);
             }
+        },
+        figureClick: (e) => {
+            e.stopImmediatePropagation();
+
+            console.log(e.target);
+            that.set(e.target).open(null);
         },
         keyboardNavigation: (e) => {
             if (that.isOpen()) {
@@ -271,6 +277,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 // Click on the gallery
                 container.addEventListener('click', eventCallbacks.containerClick, false);
 
+                figures.forEach((figure) => {
+                    figure.addEventListener('click', eventCallbacks.figureClick, false);
+                });
+
                 // Keyboard navigation
                 document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
 
@@ -291,6 +301,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
         else {
             container.removeEventListener('click', eventCallbacks.containerClick, false);
+
+            figures.forEach((figure) => {
+                figure.removeEventListener('click', eventCallbacks.figureClick, false);
+            });
 
             document.removeEventListener('keydown', eventCallbacks.keyboardNavigation);
 

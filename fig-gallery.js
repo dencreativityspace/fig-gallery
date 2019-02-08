@@ -78,7 +78,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             dialog.buttons[type] = button;
         }
 
-        // Utility to get the image of the current figure
+        // Utility to get the image of the current figure.
         dialog.getContent = function () {
             return dialog.content.querySelector('img, video');
         }
@@ -86,7 +86,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         return dialog;
     })();
 
-    // Takes the current image
+    // Takes the current image.
     let current = (() => {
         for (const figure of figures) {
             if (figure.classList.contains(currentClass)) {
@@ -100,6 +100,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             if (!that.isOpen()) {
                 that.open(null);
             }
+        },
+        figureClick: (e) => {
+            e.stopImmediatePropagation();
+
+            that.set(e.target).open(null);
         },
         keyboardNavigation: (e) => {
             if (that.isOpen()) {
@@ -233,6 +238,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 // Click on the gallery
                 container.addEventListener('click', eventCallbacks.containerClick, false);
 
+                figures.forEach((figure) => {
+                    figure.addEventListener('click', eventCallbacks.figureClick, false);
+                });
+
                 // Keyboard navigation
                 document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
 
@@ -241,6 +250,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
         else {
             container.removeEventListener('click', eventCallbacks.containerClick, false);
+
+            figures.forEach((figure) => {
+                figure.removeEventListener('click', eventCallbacks.figureClick, false);
+            });
 
             document.removeEventListener('keydown', eventCallbacks.keyboardNavigation);
 
