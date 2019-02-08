@@ -137,6 +137,29 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
     }
 
+    // Sets the maximum embed, object or iframe size.
+    function setEmbedSize(embed) {
+        if (overlay) {
+            const overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
+
+            if (!embed.hasAttribute('data-width') || !embed.hasAttribute('data-height')) {
+                embed.setAttribute('data-width', embed.width);
+                embed.setAttribute('data-height', embed.height);
+            }
+
+            embed.width = embed.getAttribute('data-width');
+            embed.height = embed.getAttribute('data-height');
+
+            const ratio = Math.min(
+                (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / embed.width,
+                (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.weight
+            );
+
+            embed.width = (embed.width * ratio) + 'px';
+            embed.height = (embed.height * ratio) + 'px';
+        }
+    }
+
     function setContentSize() {
         if (overlay) {
             const content = overlay.getContent();
@@ -149,6 +172,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                     case 'VIDEO':
                         setVideoSize(content);
                         break;
+                    case 'EMBED':
+                    case 'VIDEO':
+                    case 'OBJECT':
+                        setEmbedSize(content);
                 }
             }
         }
@@ -196,7 +223,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
             // Utility to get the image of the current figure.
             dialog.getContent = function () {
-                return dialog.content.querySelector('img, video');
+                return dialog.content.querySelector('img, video, object, embed, iframe');
             }
 
             dialogCache = dialog;
