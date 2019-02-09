@@ -546,6 +546,15 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     };
 
     /**
+     * Returns the container element.
+     *
+     * @return  {HTMLElement}
+    */
+    this.getContainer = () => {
+        return container;
+    };
+
+    /**
      * Returns the current figure element.
      *
      * @return  {HTMLElement}
