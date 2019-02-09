@@ -449,10 +449,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
 
         setCurrentFigure(figure);
-
-        if (that.isOpen()) {
-            updateOverlayFigure();
-        }
+        updateOverlayFigure();
 
         return this;
     };
