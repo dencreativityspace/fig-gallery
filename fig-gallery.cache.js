@@ -69,7 +69,6 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         figureClick: (e) => {
             e.stopImmediatePropagation();
 
-            console.log(e.target);
             that.set(e.target).open(null);
         },
         keyboardNavigation: (e) => {
@@ -159,8 +158,6 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / embed.width,
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.height
             );
-
-            console.log(ratio);
 
             embed.width = parseInt(embed.width * ratio);
             embed.height = parseInt(embed.height * ratio);
