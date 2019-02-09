@@ -303,7 +303,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     }
 
     // Event Listeners
-    const setListeners = (function setListenersFn(op) {
+    const setListeners = (function setListenersFn(op, forceFigures = false) {
         if (op == null || typeof op !== 'boolean') {
             throw new Error('Il valore deve essere di tipo booleano.');
         }
@@ -313,9 +313,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 // Click on the gallery
                 container.addEventListener('click', eventCallbacks.containerClick, false);
 
-                figures.forEach((figure) => {
-                    figure.addEventListener('click', eventCallbacks.figureClick, false);
-                });
+                if (forceFigures || !mutation) {
+                    figures.forEach((figure) => {
+                        figure.addEventListener('click', eventCallbacks.figureClick, false);
+                    });
+                }
 
                 // Keyboard navigation
                 document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
@@ -332,7 +334,6 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                         overlay.buttons[type].addEventListener('click', eventCallbacks.buttons[type], false);
                     }
                 }
-
             }
         }
         else {
@@ -355,20 +356,28 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
 
         return setListenersFn;
-    })(openable);
+    })(openable, true);
+
+    let mutation = null;
 
     // Creates the MutationObserver if supported.
     if ('MutationObserver' in window) {
-        const mutation = new MutationObserver((mutations, observer) => {
+        mutation = new MutationObserver((mutations, observer) => {
             mutations.forEach((mut) => {
                 if (mut.type === 'childList') {
                     figures = container.querySelectorAll('figure');
 
-                    figures.forEach((figure) => {
-                        figure.addEventListener('click', eventCallbacks.figureClick, false);
-                    });
+                    if (mut.addedNodes && mut.addedNodes.length > 0) {
 
-                    if (mutation.removedNodes && current in mutation.removedNodes.values()) {
+
+                        mut.addedNodes.forEach((figure) => {
+                            if (figure.tagName === 'FIGURE') {
+                                figure.addEventListener('click', eventCallbacks.figureClick, false);
+                            }
+                        });
+                    }
+
+                    if (mut.removedNodes && current in mut.removedNodes.values()) {
                         current = figures[0] || null;
                     }
                 }
@@ -525,12 +534,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         if (val) {
             overlay = createOverlay();
 
-            if ('MutationObserver' in window && mutation) {
+            if (mutation) {
                 mutation.observe(container, { childList: true });
             }
         }
         else {
-            if ('MutationObserver' in window && mutation) {
+            overlay = null;
+
+            if (mutation) {
                 mutation.disconnect();
             }
 
@@ -539,8 +550,6 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             }
         }
 
-
-        overlay = null;
         setListeners(val);
 
         return this;
@@ -550,14 +559,19 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * Forces the update of the child list.
      * Useful when browser doesn't support MutationObserver.
      *
+     * @param   {boolean}   [events=true]   Determines if the events should be
+     *                                      updated too.
+     *
      * @return  {this}
     */
-    this.updateFigures = () => {
+    this.updateFigures = (events = true) => {
         figures = contaier.querySelctorAll('figure');
 
-        figures.forEach((figure) => {
-            figure.addEventListener('click', eventCallbacks.figureClick, false);
-        });
+        if (!!events) {
+            figures.forEach((figure) => {
+                figure.addEventListener('click', eventCallbacks.figureClick, false);
+            });
+        }
 
         if (!(current in figures)) {
             current = figures[0] || null;
