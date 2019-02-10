@@ -384,6 +384,25 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             }
         }
 
+        let openedEvent = null;
+
+        if (typeof window.CustomEvent !== 'function') {
+            openedEvent = document.createEvent('opened');
+
+             openedEvent.initCustomEvent('opened', false, false, {
+                current: current
+            });
+        }
+        else {
+            openedEvent = new CustomEvent('opened', {
+                detail: {
+                    current: current
+                }
+            });
+        }
+
+        container.dispatchEvent(openedEvent);
+
         return this;
     };
 
@@ -395,7 +414,30 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
     */
     this.prev = (cycleState = cycle) => {
+        const oldCurrent = current;
+
         navigateOverlayFigure(-1, cycleState);
+
+        let prevEvent = null;
+
+        if (typeof window.CustomEvent !== 'function') {
+            prevEvent = document.createEvent('prev');
+
+             prevEvent.initCustomEvent('prev', false, false, {
+                current: current,
+                next: oldCurrent
+            });
+        }
+        else {
+            prevEvent = new CustomEvent('prev', {
+                detail: {
+                    current: current,
+                    next: oldCurrent
+                }
+            });
+        }
+
+        container.dispatchEvent(prevEvent);
 
         return this;
     };
@@ -408,7 +450,30 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
     */
     this.next = (cycleState = cycle) => {
+        const oldCurrent = current;
+
         navigateOverlayFigure(1, cycleState);
+
+        let nextEvent = null;
+
+        if (typeof window.CustomEvent !== 'function') {
+            nextEvent = document.createEvent('next');
+
+             nextEvent.initCustomEvent('next', false, false, {
+                current: current,
+                prev: oldCurrent
+            });
+        }
+        else {
+            nextEvent = new CustomEvent('next', {
+                detail: {
+                    current: current,
+                    prev: oldCurrent
+                }
+            });
+        }
+
+        container.dispatchEvent(nextEvent);
 
         return this;
     };
@@ -448,8 +513,31 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             throw new Error(`L'elemento indicato non è un valore valido. Inserire un numero intero o un elemento DOM.`);
         }
 
+        const oldCurrent = current;
+
         setCurrentFigure(figure);
         updateOverlayFigure();
+
+        let settedEvent = null;
+
+        if (typeof window.CustomEvent !== 'function') {
+            settedEvent = document.createEvent('setted');
+
+             settedEvent.initCustomEvent('setted', false, false, {
+                current: current,
+                old: oldCurrent
+            });
+        }
+        else {
+            settedEvent = new CustomEvent('setted', {
+                detail: {
+                    current: current,
+                    old: oldCurrent
+                }
+            });
+        }
+
+        container.dispatchEvent(settedEvent);
 
         return this;
     };
@@ -471,6 +559,25 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             }
         }
 
+        let closedEvent = null;
+
+        if (typeof window.CustomEvent !== 'function') {
+            closedEvent = document.createEvent('closed');
+
+             closedEvent.initCustomEvent('closed', false, false, {
+                current: current
+            });
+        }
+        else {
+            closedEvent = new CustomEvent('closed', {
+                detail: {
+                    current: current
+                }
+            });
+        }
+
+        container.dispatchEvent(closedEvent);
+
         return this;
     };
 
@@ -486,18 +593,39 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             throw new Error('Il valore deve essere di tipo booleano');
         }
 
-        openable = val;
+        if (val !== openable) {
+            openable = val;
 
-        if (mutation) {
-            if (val) {
-                mutation.observe(container, { childList: true });
+            if (mutation) {
+                if (val) {
+                    mutation.observe(container, { childList: true });
+                }
+                else {
+                    mutation.disconnect();
+                }
+            }
+
+            setListeners(val);
+
+            let openablechangeEvent = null;
+
+            if (typeof window.CustomEvent !== 'function') {
+                openablechangeEvent = document.createEvent('openablechange');
+
+                 openablechangeEvent.initCustomEvent('openablechange', false, false, {
+                    openable: val
+                });
             }
             else {
-                mutation.disconnect();
+                openablechangeEvent = new CustomEvent('openablechange', {
+                    detail: {
+                        openable: val
+                    }
+                });
             }
-        }
 
-        setListeners(val);
+            container.dispatchEvent(openablechangeEvent);
+        }
 
         return this;
     }
