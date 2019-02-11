@@ -226,7 +226,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             }
 
             // Utility to get the content of the current figure.
-            dialog.getContent = function () {
+            dialog.getContent = () => {
                 return dialog.content.querySelector('img, video, object, embed, iframe');
             };
 
@@ -739,5 +739,23 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     */
     this.getCurrentFigure = () => {
         return current;
+    };
+
+    /**
+     * Returns the current figure element in the overlay.
+     *
+     * @return  {HTMLElement}
+     */
+    this.getActiveFigure = () => {
+        return overlay.content;
+    };
+
+    /**
+     * Returns the content of the current figure element in the overlay.
+     *
+     * @return  {HTMLElement}
+     */
+    this.getActiveContent = () => {
+        return overlay.getContent();
     };
 }
