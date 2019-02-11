@@ -1,6 +1,6 @@
 function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false}) {
     // Type-checks
-    if (typeof contaier === 'string') {
+    if (typeof container === 'string') {
         container = document.querySelector(container);
     }
 
