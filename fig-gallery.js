@@ -32,7 +32,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     const overlayClasses = {
         overlay: overlaySelectors.overlay.substr(1),
         content: overlaySelectors.content.substr(1)
-    }
+    };
 
     // Sets the gallery class.
     if (!container.classList.contains(galleryClass)) {
@@ -81,7 +81,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         // Utility to get the content of the current figure.
         dialog.getContent = function () {
             return dialog.content.querySelector('img, video, object, embed, iframe');
-        }
+        };
 
         return dialog;
     })();
@@ -132,11 +132,9 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             }
         },
         resize: () => {
-            setContentSize()
+            setContentSize();
         }
-    }
-
-    let mutation = null;
+    };
 
     // Private methods
     // Keeps `figures` index in bound.
@@ -308,7 +306,6 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         return setListenersFn;
     })(openable, true);
 
-
     // Binds the overlay buttons to the public methods
     for (const type of Object.keys(overlay.buttons)) {
         overlay.buttons[type].addEventListener('click', (e) => {
@@ -318,7 +315,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }, false);
     }
 
-    let mutation = null
+    let mutation = null;
 
     // Creates the MutationObserver if supported.
     if ('MutationObserver' in window) {
@@ -628,7 +625,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
 
         return this;
-    }
+    };
 
     /**
      * Forces the update of the child list.

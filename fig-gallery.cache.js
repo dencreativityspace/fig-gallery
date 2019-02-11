@@ -32,7 +32,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     const overlayClasses = {
         overlay: overlaySelectors.overlay.substr(1),
         content: overlaySelectors.content.substr(1)
-    }
+    };
 
     // Sets the gallery class.
     if (!container.classList.contains(galleryClass)) {
@@ -228,7 +228,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             // Utility to get the content of the current figure.
             dialog.getContent = function () {
                 return dialog.content.querySelector('img, video, object, embed, iframe');
-            }
+            };
 
             dialogCache = dialog;
 
