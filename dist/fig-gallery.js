@@ -25,7 +25,7 @@ function FigureGallery(_ref) {
       throwsOpenIndexError = _ref$throwsOpenIndexE === void 0 ? false : _ref$throwsOpenIndexE;
 
   // Type-checks
-  if (typeof contaier === 'string') {
+  if (typeof container === 'string') {
     container = document.querySelector(container);
   }
 
@@ -711,5 +711,25 @@ function FigureGallery(_ref) {
 
   this.getCurrentFigure = function () {
     return current;
+  };
+  /**
+   * Returns the current figure element in the overlay.
+   *
+   * @return  {HTMLElement}
+   */
+
+
+  this.getActiveFigure = function () {
+    return overlay.content;
+  };
+  /**
+   * Returns the content of the current figure element in the overlay.
+   *
+   * @return  {HTMLElement}
+   */
+
+
+  this.getActiveContent = function () {
+    return overlay.getContent();
   };
 }
