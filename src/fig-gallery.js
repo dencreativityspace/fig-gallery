@@ -262,21 +262,32 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
                 switch (key) {
                     case 27: // Esc
-                        this.close();
+                        that.close();
                         break;
                     case 37: // Left arrow
-                        this.prev();
+                        that.prev();
                         break;
                     case 39: // Right arrow
-                        this.next();
+                        that.next();
                         break;
                     case 36: // Home
-                        this.open(0);
+                        that.open(0);
                         break;
                     case 35: // End
-                        this.open(-1);
+                        that.open(-1);
                         break;
                 }
+            }
+        },
+        swipeNavigation: (e) => {
+            const direction = e.detail.direction || e.direction || null;
+
+            if (direction === 'left') {
+                that.prev();
+            }
+            else if (direction === 'right') {
+                that.next();
+
             }
         },
         resize: () => {
