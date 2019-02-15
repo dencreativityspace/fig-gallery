@@ -162,8 +162,29 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         return figures[0] || null;
     })();
 
-    // Stores the callbacks for the events.
     /**
+    * Contains the swipe handler if SwipeEvent is present.
+    *
+    * @type {SwipeEvent|null}
+    *
+    * @private
+    *
+    * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+    */
+    const swipeHandler = (() => {
+        if (typeof SwipeEvent === 'function') {
+            const swipe = new SwipeEvent({
+                element: container,
+                itemSelector: 'figure',
+                activeSelector: currentSelector
+            });
+
+            return swipe;
+        }
+
+        return null;
+    })();
+
     /**
     * Stores the callbacks for the events.
     *
@@ -536,6 +557,15 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             // Keyboard navigation
             document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
 
+            // Swipe navigation - since 1.1.0
+            if (swipeHandler) {
+                swipeHandler.attach();
+                /**
+                 * @listens swipe-event#swipe
+                 * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+                 */
+                document.addEventListener('swipe', eventCallbacks.swipeNavigation);
+            }
 
             window.addEventListener('resize', eventCallbacks.resize);
 
@@ -558,6 +588,12 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             });
 
             document.removeEventListener('keydown', eventCallbacks.keyboardNavigation);
+
+            if (swipeHandler) {
+                swipeHandler.detach();
+
+                document.removeEventListener('swipe', eventCallbacks.swipeNavigation);
+            }
 
             window.removeEventListener('resize', eventCallbacks.resize);
 
@@ -1004,5 +1040,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      */
     this.getActiveContent = () => {
         return overlay.getContent();
+    };
+
+    /**
+     * Returns the swipe handler instance, if exists.
+     *
+     * @return  {SwipeEvent|null}
+     */
+    this.getSwipeHandler = () => {
+        return swipeHandler;
     };
 }
