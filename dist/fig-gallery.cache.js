@@ -1,5 +1,38 @@
 "use strict";
 
+/**
+ * Gallery that permits to see images or videos at the maximum of their sizes
+ * or, at least the maximum that fits in the window respecting ratio.
+ * Removes the controls and caches the overlay.
+ *
+ * @constructor
+ *
+ * @param {object} param
+ * @param {string|HTMLElement} [param.container='#gallery'] Container of the gallery.
+ * @param {string} [param.gallerySelector='.gallery'] Gallery selector.
+ * @param {string} [param.openSelector='.open'] Selector for the open gallery.
+ * @param {string} [param.currentSelector='.current'] Selector of the current element.
+ * @param {object} [param.buttonSelectors={}] Selectors for the overlay buttons.
+ * @param {string} [param.buttonSelectors.close='.close'] Selector for the 'close' button.
+ * @param {string} [param.buttonSelectors.prev='.prev'] Selector for the 'previous' button.
+ * @param {string} [param.buttonSelectors.next='.next'] Selector for the 'next' button.
+ * @param {object} [param.buttonContents={}] Contents for the overlay buttons.
+ * @param {string} [param.buttonContents.close='&times;'] Content for the 'close' button.
+ * @param {string} [param.buttonContents.prev='&lang;'] Content for the 'previous' button.
+ * @param {string} [param.buttonContents.next='&rang;'] Content for the 'next' button.
+ * @param {object} [param.overlaySelectors={}] Selectors for the overlay elements.
+ * @param {string} [param.overlaySelectors.overlay='.overlay'] Selector for the overlay element.
+ * @param {string} [param.overlaySelectors.content='.overlay-content'] Selector content of the overlay element.
+ * @param {boolean} [param.cycle=true] Determines if the gallery can cycle when reaches the end-points.
+ * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
+ * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
+ *
+ *  @throws Will throw an error if the container argument isn't an HTMLElement.
+ *
+ * @version 1.2.0
+ *
+ * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
+ */
 function FigureGallery(_ref) {
   var _this = this;
 
@@ -51,14 +84,60 @@ function FigureGallery(_ref) {
     content: '.overlay-content'
   }, overlaySelectors); // Class mapping:
 
+  /**
+   * CSS class of the gallery. Applies to container.
+   *
+   * @constant
+   * @type {string}
+   *
+   * @private
+   */
+
   var galleryClass = gallerySelector.substr(1);
+  /**
+   * CSS class for the open state of the gallery. Applies to container.
+   *
+   * @constant
+   * @type {string}
+   *
+   * @private
+   */
+
   var openClass = openSelector.substr(1);
+  /**
+   * CSS class for the current figure. Applies to the original selected <figure>
+   * and the chosen one. Can be applied only to one element at the time.
+   *
+   * @constant
+   * @type {string}
+   *
+   * @private
+   */
+
   var currentClass = currentSelector.substr(1);
+  /**
+   * Object containining the CSS classes that get applied to the buttons of the overlay.
+   *
+   * @constant
+   * @enum {string}
+   *
+   * @private
+   */
+
   var buttonClasses = {
     close: buttonSelectors.close.substr(1),
     prev: buttonSelectors.prev.substr(1),
     next: buttonSelectors.next.substr(1)
   };
+  /**
+   * Object containining the CSS classes that get applied to the overlay.
+   *
+   * @constant
+   * @enum {string}
+   *
+   * @private
+   */
+
   var overlayClasses = {
     overlay: overlaySelectors.overlay.substr(1),
     content: overlaySelectors.content.substr(1)
@@ -66,14 +145,44 @@ function FigureGallery(_ref) {
 
   if (!container.classList.contains(galleryClass)) {
     container.classList.add(galleryClass);
-  } // Maps initial figures.
+  }
+  /**
+   * Gets all the <figure> elements children of container.
+   *
+   * @type {HTMLElement[]}
+   *
+   * @private
+   */
 
 
-  var figures = container.querySelectorAll('figure'); // Caches the overlay when removed.
+  var figures = container.querySelectorAll('figure');
+  /**
+   * Caches the overlay when removed.
+   *
+   * @type {HTMLDialogElement|HTMLDivElement|null}
+   *
+   * @private
+   */
 
-  var dialogCache = null; // Sets default overlay.
+  var dialogCache = null;
+  /**
+  * Represents the overlay element.
+  *
+  * @type {HTMLDialogElement|HTMLDivElement}
+  *
+  * @private
+  *
+  * @see createOverlay
+  */
 
-  var overlay = createOverlay(); // Takes the current image.
+  var overlay = createOverlay();
+  /**
+  * Represents the current element in container.
+  *
+  * @type {HTMLElement}
+  *
+  * @private
+  */
 
   var current = function () {
     var _iteratorNormalCompletion = true;
@@ -104,7 +213,37 @@ function FigureGallery(_ref) {
     }
 
     return figures[0] || null;
-  }(); // Stores the callbacks for the events.
+  }();
+  /**
+  * Contains the swipe handler if SwipeEvent is present.
+  *
+  * @type {SwipeEvent|null}
+  *
+  * @private
+  *
+  * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+  */
+
+
+  var swipeHandler = function () {
+    if (typeof SwipeEvent === 'function') {
+      var swipe = new SwipeEvent({
+        element: container,
+        itemSelector: 'figure',
+        activeSelector: currentSelector
+      });
+      return swipe;
+    }
+
+    return null;
+  }();
+  /**
+  * Stores the callbacks for the events.
+  *
+  * @type {object}
+  *
+  * @private
+  */
 
 
   var eventCallbacks = {
@@ -124,34 +263,38 @@ function FigureGallery(_ref) {
         switch (key) {
           case 27:
             // Esc
-            _this.close();
-
+            that.close();
             break;
 
           case 37:
             // Left arrow
-            _this.prev();
-
+            that.prev();
             break;
 
           case 39:
             // Right arrow
-            _this.next();
-
+            that.next();
             break;
 
           case 36:
             // Home
-            _this.open(0);
-
+            that.open(0);
             break;
 
           case 35:
             // End
-            _this.open(-1);
-
+            that.open(-1);
             break;
         }
+      }
+    },
+    swipeNavigation: function swipeNavigation(e) {
+      var direction = e.detail.direction || e.direction || null;
+
+      if (direction === 'left') {
+        that.prev();
+      } else if (direction === 'right') {
+        that.next();
       }
     },
     resize: function resize() {
@@ -159,12 +302,29 @@ function FigureGallery(_ref) {
     },
     buttons: createButtonsCallbacks()
   }; // Private methods
-  // Keeps `figures` index in bound.
+
+  /**
+   * Keeps `<figure>`s index in bound.
+   *
+   * @param {number} index Index to check if in bound.
+   * @param {boolean} [cycleState=cycle] Determines if function have to keep
+   * in bound considering the possibility to cycle through the elements.
+   *
+   * @return {number}
+   * @private
+   */
 
   function keepInBound(index) {
     var cycleState = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : cycle;
     return (cycleState && index < 0 ? figures.length + index + figures.length : index) % figures.length;
-  } // Sets the maximum image size.
+  }
+  /**
+   * Sets the maximum image size possible.
+   *
+   * @param {HTMLImageElement} image Image element to be resized.
+   *
+   * @private
+   */
 
 
   function setImageSize(image) {
@@ -174,7 +334,14 @@ function FigureGallery(_ref) {
       image.style.width = image.naturalWidth * ratio + 'px';
       image.style.height = image.naturalHeight * ratio + 'px';
     }
-  } // Sets the maximum video size.
+  }
+  /**
+   * Sets the maximum video size possible.
+   *
+   * @param {HTMLVideoElement} video Video element to be resized.
+   *
+   * @private
+   */
 
 
   function setVideoSize(video) {
@@ -184,7 +351,14 @@ function FigureGallery(_ref) {
       video.style.width = video.videoWidth * ratio + 'px';
       video.style.height = video.videoHeight * ratio + 'px';
     }
-  } // Sets the maximum embed, object or iframe size.
+  }
+  /**
+   * Sets the maximum embed, object or iframe size possible.
+   *
+   * @param {HTMLEmbedElement|HTMLObjectElement|HTMLIFrameElement} embed Embed, object or iframe element to be resized.
+   *
+   * @private
+   */
 
 
   function setEmbedSize(embed) {
@@ -203,6 +377,17 @@ function FigureGallery(_ref) {
       embed.height = parseInt(embed.height * ratio);
     }
   }
+  /**
+   * Sets the maximum size possible for the current content of the overlay.
+   * Routes by the type of the element.
+   *
+   * @see setImageSize
+   * @see setVideoSize
+   * @see setEmbedSize
+   *
+   * @private
+   */
+
 
   function setContentSize() {
     if (overlay) {
@@ -225,7 +410,18 @@ function FigureGallery(_ref) {
         }
       }
     }
-  } // Creates the overlay.
+  }
+  /**
+   * Creates the overlay object or retrieves it from cache.
+   * May return null if `openable` is `false`.
+   *
+   * @return {HTMLDialogElement|HTMLDivElement|null}
+   *
+   * @see dialogCache
+   * @see overlay
+   *
+   * @private
+   */
 
 
   function createOverlay() {
@@ -274,12 +470,28 @@ function FigureGallery(_ref) {
     }
 
     return null;
-  } // Gets the index of the given figure.
+  }
+  /**
+   * Gets the index of the given figure.
+   *
+   * @param {HTMLElement} figure
+   *
+   * @return {number}
+   *
+   * @private
+   */
 
 
   function getFigureIndex(figure) {
     return Array.prototype.indexOf.call(figures, figure);
-  } // Sets the current figure.
+  }
+  /**
+   * Sets the given figure as current.
+   *
+   * @param {HTMLElement} figure
+   *
+   * @private
+   */
 
 
   function setCurrentFigure(figure) {
@@ -289,7 +501,15 @@ function FigureGallery(_ref) {
 
     figure.classList.add(currentClass);
     current = figure;
-  } // Updates and opens the overlay.
+  }
+  /**
+   * Updates the content of the overlay by cloning the current figure and
+   * opens the overlay.
+   *
+   * @see setContentSize
+   *
+   * @private
+   */
 
 
   function updateOverlayFigure() {
@@ -310,6 +530,18 @@ function FigureGallery(_ref) {
       setContentSize();
     }
   }
+  /**
+   * Lets the user navigate through the gallery.
+   *
+   * @param {number} [dir=1] Number of elements next or before the current.
+   * @param {boolean} [cycleState=cycle] Determines if the counter must cycle.
+   *
+   * @see setCurrentFigure
+   * @see updateOverlayFigure
+   *
+   * @private
+   */
+
 
   function navigateOverlayFigure() {
     var dir = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
@@ -320,6 +552,18 @@ function FigureGallery(_ref) {
       updateOverlayFigure();
     }
   }
+  /**
+   * Creates the object that will containt the button callbacks.
+   * Returns `null` if `overlay` doesn't exists.
+   * Useful for caching.
+   *
+   * @return {object|null}
+   *
+   * @see overlay
+   *
+   * @private
+   */
+
 
   function createButtonsCallbacks() {
     if (overlay) {
@@ -346,40 +590,61 @@ function FigureGallery(_ref) {
     return null;
   } // Event Listeners
 
-
-  var setListeners = function setListenersFn(op) {
-    var forceFigures = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-    if (op == null || typeof op !== 'boolean') {
-      throw new Error('Il valore deve essere di tipo booleano.');
-    }
-
-    if (op) {
-      if (openable) {
-        // Click on the gallery
-        container.addEventListener('click', eventCallbacks.containerClick, false);
-
-        if (forceFigures || !mutation) {
-          figures.forEach(function (figure) {
-            figure.addEventListener('click', eventCallbacks.figureClick, false);
-          });
-        } // Keyboard navigation
+  /**
+   * Adds or removes all the event listeners to container.
+   * Uses `createButtonsCallbacks()` to create the button callbacks and
+   * appends them to `eventCallbacks`.
+   *
+   * @function
+   *
+   * @param {boolean} [forceFigures=false] Determines if the update must be forced.
+   * Useful when MutationObserver isn't supported.
+   *
+   * @see createButtonsCallbacks
+   * @see eventCallbacks
+   *
+   * @private
+   */
 
 
-        document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
-        window.addEventListener('resize', eventCallbacks.resize); // Binds the overlay buttons to the public methods
+  var setListeners = function setListenersFn() {
+    var forceFigures = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-        if (overlay) {
-          if (!eventCallbacks.buttons) {
-            eventCallbacks.buttons = createButtonsCallbacks();
-          }
+    if (openable) {
+      // Click on the gallery
+      container.addEventListener('click', eventCallbacks.containerClick, false);
 
-          var _arr2 = Object.keys(overlay.buttons);
+      if (forceFigures || !mutation) {
+        figures.forEach(function (figure) {
+          figure.addEventListener('click', eventCallbacks.figureClick, false);
+        });
+      } // Keyboard navigation
 
-          for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-            var type = _arr2[_i2];
-            overlay.buttons[type].addEventListener('click', eventCallbacks.buttons[type], false);
-          }
+
+      document.addEventListener('keydown', eventCallbacks.keyboardNavigation); // Swipe navigation - since 1.1.0
+
+      if (swipeHandler) {
+        swipeHandler.attach();
+        /**
+         * @listens swipe-event#swipe
+         * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+         */
+
+        document.addEventListener('swipe', eventCallbacks.swipeNavigation);
+      }
+
+      window.addEventListener('resize', eventCallbacks.resize); // Binds the overlay buttons to the public methods
+
+      if (overlay) {
+        if (!eventCallbacks.buttons) {
+          eventCallbacks.buttons = createButtonsCallbacks();
+        }
+
+        var _arr2 = Object.keys(overlay.buttons);
+
+        for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+          var type = _arr2[_i2];
+          overlay.buttons[type].addEventListener('click', eventCallbacks.buttons[type], false);
         }
       }
     } else {
@@ -388,6 +653,12 @@ function FigureGallery(_ref) {
         figure.removeEventListener('click', eventCallbacks.figureClick, false);
       });
       document.removeEventListener('keydown', eventCallbacks.keyboardNavigation);
+
+      if (swipeHandler) {
+        swipeHandler.detach();
+        document.removeEventListener('swipe', eventCallbacks.swipeNavigation);
+      }
+
       window.removeEventListener('resize', eventCallbacks.resize);
 
       if (overlay) {
@@ -402,42 +673,59 @@ function FigureGallery(_ref) {
     }
 
     return setListenersFn;
-  }(openable, true);
+  }(true);
+  /**
+   * Will contain MutationObserver instance if supported.
+   *
+   * @constant
+   * @type {MutationObserver|null}
+   *
+   * @private
+   */
 
-  var mutation = null; // Creates the MutationObserver if supported.
 
-  if ('MutationObserver' in window) {
-    mutation = new MutationObserver(function (mutations, observer) {
-      mutations.forEach(function (mut) {
-        if (mut.type === 'childList') {
-          figures = container.querySelectorAll('figure');
+  var mutation = function () {
+    if ('MutationObserver' in window) {
+      var m = new MutationObserver(function (mutations, observer) {
+        mutations.forEach(function (mut) {
+          if (mut.type === 'childList') {
+            figures = container.querySelectorAll('figure');
 
-          if (mut.addedNodes && mut.addedNodes.length > 0) {
-            mut.addedNodes.forEach(function (figure) {
-              if (figure.tagName === 'FIGURE') {
-                figure.addEventListener('click', eventCallbacks.figureClick, false);
-              }
-            });
+            if (mut.addedNodes && mut.addedNodes.length > 0) {
+              mut.addedNodes.forEach(function (figure) {
+                if (figure.tagName === 'FIGURE') {
+                  figure.addEventListener('click', eventCallbacks.figureClick, false);
+                }
+              });
+            }
+
+            if (mut.removedNodes && current in mut.removedNodes.values()) {
+              current = figures[0] || null;
+            }
           }
-
-          if (mut.removedNodes && current in mut.removedNodes.values()) {
-            current = figures[0] || null;
-          }
-        }
+        });
       });
-    });
-    mutation.observe(container, {
-      childList: true
-    });
-  } // Public methods
+      m.observe(container, {
+        childList: true
+      });
+      return m;
+    }
+
+    return null;
+  }(); // Public methods
 
   /**
-   * Opens the overlay to show the image with the given index.
+   * Opens the overlay to show the `<figure>` with the given index or the current one.
    *
    * @param   {?number}   [index=0]   Index of the element to be shown.
    *                                  If is null gets the current figure.
    *
+   * @emits FigureGallery#opened
+   *
    * @return  {this}
+   *
+   * @throws Will throw an error if `throwsOpenIndexError` is set to `true`
+   * and the given index is out of bound.
   */
 
 
@@ -487,9 +775,11 @@ function FigureGallery(_ref) {
     return _this;
   };
   /**
-   * Shows the previous image. If the ovelay is closed, opens it.
+   * Shows the previous `<figure>`. If the ovelay is closed, opens it.
    *
    * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
+   *
+   * @emits FigureGallery#prev
    *
    * @return  {this}
   */
@@ -520,9 +810,11 @@ function FigureGallery(_ref) {
     return _this;
   };
   /**
-   * Shows the next image. If the ovelay is closed, opens it.
+   * Shows the next `<figure>`. If the ovelay is closed, opens it.
    *
    * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
+   *
+   * @emits FigureGallery#next
    *
    * @return  {this}
   */
@@ -553,13 +845,20 @@ function FigureGallery(_ref) {
     return _this;
   };
   /**
-   * Sets the current figure.
+   * Sets the current `<figure>`.
    *
    * @param   {number|HTMLElement}   figure   Index of the element or the
    *                                          element itself to bet setted as
    *                                          current.
    *
+   * @emits FigureGallery#setted
+   *
    * @return  {this}
+   *
+   * @throws Will throw an error if the argument is null.
+   * @throws Will throw an error if the argument isn't a child of the container.
+   * @throws Will throw an error if `throwsOpenIndexError` is set to true and if the user tries to go beyond the end-points.
+   * @throws Will throw an error if the argument isn't a valid element.
   */
 
 
@@ -612,6 +911,8 @@ function FigureGallery(_ref) {
   /**
    * Closes the overlay.
    *
+   * @emits FigureGallery#closed
+   *
    * @return  {this}
   */
 
@@ -650,7 +951,11 @@ function FigureGallery(_ref) {
    *
    * @param   {boolean}   val
    *
+   * @emits FigureGallery#openablechange
+   *
    * @return  {this}
+   *
+   * @throws Will throw an error if the argument is null or isn't a boolean.
   */
 
 
@@ -682,7 +987,7 @@ function FigureGallery(_ref) {
         }
       }
 
-      setListeners(val);
+      setListeners();
       var openablechangeEvent = null;
 
       if (typeof window.CustomEvent !== 'function') {
@@ -789,5 +1094,15 @@ function FigureGallery(_ref) {
 
   this.getActiveContent = function () {
     return overlay.getContent();
+  };
+  /**
+   * Returns the swipe handler instance, if exists.
+   *
+   * @return  {SwipeEvent|null}
+   */
+
+
+  this.getSwipeHandler = function () {
+    return swipeHandler;
   };
 }
