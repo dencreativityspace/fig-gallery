@@ -9,6 +9,7 @@
  * @param {string} [param.gallerySelector='.gallery'] Gallery selector.
  * @param {string} [param.openSelector='.open'] Selector for the open gallery.
  * @param {string} [param.currentSelector='.current'] Selector of the current element.
+ * @param {string|null} [param.buttonContainerSelector=null] Selector of the container of the buttons. Must be a static element in the overlay or the overaly itself (rapresented by the value `null`).
  * @param {object} [param.buttonSelectors={}] Selectors for the overlay buttons.
  * @param {string} [param.buttonSelectors.close='.close'] Selector for the 'close' button.
  * @param {string} [param.buttonSelectors.prev='.prev'] Selector for the 'previous' button.
@@ -23,14 +24,22 @@
  * @param {boolean} [param.cycle=true] Determines if the gallery can cycle when reaches the end-points.
  * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
  * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
+ * @param {string} [buttonPlacementPolicy='ALL'] If `buttonContainerSelector` isn't `null`, permits to choose which button should be move inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`.
  *
  * @throws Will throw an error if the container argument isn't an HTMLElement.
+ * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
  *
- * @version 1.2.1
+ * @version 1.3.0
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false}) {
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, buttonPlacementPolicy = 'ALL'}) {
+    const BUTTON_PLACEMENT_POLICY = [
+        'ALL',
+        'NAVIGATORS_ONLY',
+        'CLOSE_ONLY'
+    ];
+
     // Type-checks
     if (typeof container === 'string') {
         container = document.querySelector(container);
@@ -38,6 +47,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
     if (!(container instanceof HTMLElement)) {
         throw new Error('The gallery container must be a valid DOM element.');
+    }
+
+    if (buttonContainerSelector !== null && BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
+        throw new Error('The specified button placement policy is not defined.');
     }
 
     // Shorthand to easily reach `this`.
@@ -138,7 +151,21 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
          *
          * @public
          */
-        let dialog = container.querySelector(overlaySelectors.overlay);
+        const dialog = container.querySelector(overlaySelectors.overlay);
+
+        const buttonContainer = (() => {
+            if (buttonContainerSelector === null) {
+                return null;
+            }
+
+            const buttonContainerTmp = dialog.querySelector(buttonContainerSelector);
+
+            if (!buttonContainerTmp) {
+                throw new Error(`'${buttonContainerSelector}' must be child of '${overlaySelectors.overlay}'.`);
+            }
+
+            return buttonContainerTmp;
+        })();
 
         if (!dialog) {
             // Initalizes overlay
@@ -178,7 +205,32 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 button.classList.add(buttonClasses[type]);
                 button.innerHTML = buttonContents[type];
 
-                dialog.appendChild(button);
+                if (buttonContainer === null) {
+                    dialog.appendChild(button);
+                }
+                else {
+                    if (buttonPlacementPolicy.toUpperCase() === 'ALL') {
+                        buttonContainer.appendChild(button);
+                    }
+                    else {
+                        if (buttonPlacementPolicy.toUpperCase() === 'NAVIGATORS_ONLY') {
+                            if (type !== 'close') {
+                                buttonContainer.appendChild(button);
+                            }
+                            else {
+                                dialog.appendChild(button);
+                            }
+                        }
+                        else if (buttonPlacementPolicy.toUpperCase() === 'CLOSE_ONLY') {
+                            if (type === 'close') {
+                                buttonContainer.appendChild(button);
+                            }
+                            else {
+                                dialog.appendChild(button);
+                            }
+                        }
+                    }
+                }
             }
 
             dialog.buttons[type] = button;
@@ -477,8 +529,19 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 overlay.classList.add(openClass);
             }
 
-            overlay.content.innerHTML = '';
-            overlay.content.appendChild(figureClone);
+            let currFigure = overlay.content.querySelector('figure');
+
+            if (currFigure) {
+                overlay.content.replaceChild(figureClone, currFigure);
+            }
+            else {
+                if (overlay.content.firstChild) {
+                    overlay.content.insertBefore(figureClone, overlay.content.firstChild);
+                }
+                else {
+                    overlay.content.appendChild(figureClone);
+                }
+            }
 
             setContentSize();
         }
