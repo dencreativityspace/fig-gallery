@@ -26,7 +26,7 @@
  *
  * @throws Will throw an error if the container argument isn't an HTMLElement.
  *
- * @version 1.2.0
+ * @version 1.2.1
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -37,7 +37,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     }
 
     if (!(container instanceof HTMLElement)) {
-        throw new Error('Il contenitore della galleria deve essere un elemento valido.');
+        throw new Error('The gallery container must be a valid DOM element.');
     }
 
     // Shorthand to easily reach `this`.
@@ -254,7 +254,13 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         figureClick: (e) => {
             e.stopImmediatePropagation();
 
-            that.set(e.target).open(null);
+            let figure = e.target;
+
+            while (figure.tagName !== 'FIGURE') {
+                figure = figure.parentNode;
+            }
+
+            that.set(figure).open(null);
         },
         keyboardNavigation: (e) => {
             if (that.isOpen()) {
@@ -627,7 +633,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
             if (throwsOpenIndexError) {
                 if (index > figures.length - 1 || Math.abs(index) > figures.length - 1) {
-                    throw new Error(`L'oggetto ${index} non è disponibile.`);
+                    throw new Error(`The element #${index} cannot be found.`);
                 }
             }
             else {
@@ -761,13 +767,13 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     */
     this.set = (figure) => {
         if (!figure) {
-            throw new Error(`L'elemento indicato non è un valore valido. Inserire un numero intero o un elemento DOM.`);
+            throw new Error('The given element is not a valid value. Please, insert an integer or a DOM element.');
         }
 
         if (typeof figure === 'number') {
             if (throwsOpenIndexError) {
                 if (figure > figures.length - 1 || Math.abs(figure) > figures.length - 1) {
-                    throw new Error(`L'oggetto ${figure} non è disponibile.`);
+                    throw new Error(`The element #${figure} cannot be found.`);
                 }
             }
             else {
@@ -778,11 +784,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
         else if (figure instanceof HTMLElement) {
             if (getFigureIndex(figure) < 0) {
-                throw new Error(`L'elemento indicato non fa parte di questa galleria.`);
+                throw new Error('The given element is not in this gallery.');
             }
         }
         else {
-            throw new Error(`L'elemento indicato non è un valore valido. Inserire un numero intero o un elemento DOM.`);
+            throw new Error('The given element is not a valid value. Please, insert an integer or a DOM element.');
         }
 
         const oldCurrent = current;
@@ -868,7 +874,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     */
     this.setOpenable = (val) => {
         if (typeof val !== 'boolean') {
-            throw new Error('Il valore deve essere di tipo booleano');
+            throw new Error('The value must be a boolean.');
         }
 
         if (val !== openable) {
@@ -918,7 +924,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
     */
     this.updateFigures = (events = true) => {
-        figures = contaier.querySelctorAll('figure');
+        figures = container.querySelctorAll('figure');
 
         if (!!events) {
             figures.forEach((figure) => {
