@@ -24,20 +24,27 @@
  * @param {boolean} [param.cycle=true] Determines if the gallery can cycle when reaches the end-points.
  * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
  * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
+ * @param {string} [resizePolicy='CONTENT'] Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`.
  * @param {string} [buttonPlacementPolicy='ALL'] If `buttonContainerSelector` isn't `null`, permits to choose which button should be move inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`.
  *
  * @throws Will throw an error if the container argument isn't an HTMLElement.
  * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
+ * @throws Will throw an error if the `resizePolicy` is invalid.
  *
- * @version 1.3.0
+ * @version 1.4.0
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, buttonPlacementPolicy = 'ALL'}) {
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL'}) {
     const BUTTON_PLACEMENT_POLICY = [
         'ALL',
         'NAVIGATORS_ONLY',
         'CLOSE_ONLY'
+    ];
+
+    const RESIZE_POLICY = [
+        'CONTENT',
+        'CONTAINER'
     ];
 
     // Type-checks
@@ -51,6 +58,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
     if (buttonContainerSelector !== null && BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
         throw new Error('The specified button placement policy is not defined.');
+    }
+
+    if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
+        throw new Error('The specified resize policy is not defined.');
     }
 
     // Shorthand to easily reach `this`.
@@ -386,8 +397,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / image.naturalHeight
             );
 
-            image.style.width = (image.naturalWidth * ratio) + 'px';
-            image.style.height = (image.naturalHeight * ratio) + 'px';
+            if (resizePolicy.toUpperCase() === 'CONTENT') {
+                image.style.width = (image.naturalWidth * ratio) + 'px';
+                image.style.height = (image.naturalHeight * ratio) + 'px';
+            }
+            else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+                overlay.content.style.width = (image.naturalWidth * ratio) + 'px';
+                overlay.content.style.height = (image.naturalHeight * ratio) + 'px';
+            }
         }
     }
 
@@ -408,8 +425,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / video.videoHeight
             );
 
-            video.style.width = (video.videoWidth * ratio) + 'px';
-            video.style.height = (video.videoHeight * ratio) + 'px';
+            if (resizePolicy.toUpperCase() === 'CONTENT') {
+                video.style.width = (video.videoWidth * ratio) + 'px';
+                video.style.height = (video.videoHeight * ratio) + 'px';
+            }
+            else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+                overlay.content.style.width = (video.videoWidth * ratio) + 'px';
+                overlay.content.style.height = (video.videoHeight * ratio) + 'px';
+            }
         }
     }
 
@@ -440,10 +463,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.height
             );
 
-            console.log(ratio);
-
-            embed.width = parseInt(embed.width * ratio);
-            embed.height = parseInt(embed.height * ratio);
+            if (resizePolicy.toUpperCase() === 'CONTENT') {
+                embed.width = parseInt(embed.width * ratio);
+                embed.height = parseInt(embed.height * ratio);
+            }
+            else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+                overlay.content.style.width = (embed.width * ratio) + 'px';
+                overlay.content.style.height = (embed.height * ratio) + 'px';
+            }
         }
     }
 
