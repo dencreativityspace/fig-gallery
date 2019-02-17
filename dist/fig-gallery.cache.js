@@ -12,6 +12,7 @@
  * @param {string} [param.gallerySelector='.gallery'] Gallery selector.
  * @param {string} [param.openSelector='.open'] Selector for the open gallery.
  * @param {string} [param.currentSelector='.current'] Selector of the current element.
+ * @param {string|null} [param.buttonContainerSelector=null] Selector of the container of the buttons. Must be a static element in the overlay or the overaly itself (rapresented by the value `null`).
  * @param {object} [param.buttonSelectors={}] Selectors for the overlay buttons.
  * @param {string} [param.buttonSelectors.close='.close'] Selector for the 'close' button.
  * @param {string} [param.buttonSelectors.prev='.prev'] Selector for the 'previous' button.
@@ -26,10 +27,14 @@
  * @param {boolean} [param.cycle=true] Determines if the gallery can cycle when reaches the end-points.
  * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
  * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
+ * @param {string} [resizePolicy='CONTENT'] Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`.
+ * @param {string} [buttonPlacementPolicy='ALL'] If `buttonContainerSelector` isn't `null`, permits to choose which button should be move inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`.
  *
- *  @throws Will throw an error if the container argument isn't an HTMLElement.
+ * @throws Will throw an error if the container argument isn't an HTMLElement.
+ * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
+ * @throws Will throw an error if the `resizePolicy` is invalid.
  *
- * @version 1.2.0
+ * @version 1.4.0
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -44,6 +49,8 @@ function FigureGallery(_ref) {
       openSelector = _ref$openSelector === void 0 ? '.open' : _ref$openSelector,
       _ref$currentSelector = _ref.currentSelector,
       currentSelector = _ref$currentSelector === void 0 ? '.current' : _ref$currentSelector,
+      _ref$buttonContainerS = _ref.buttonContainerSelector,
+      buttonContainerSelector = _ref$buttonContainerS === void 0 ? null : _ref$buttonContainerS,
       _ref$buttonSelectors = _ref.buttonSelectors,
       buttonSelectors = _ref$buttonSelectors === void 0 ? {} : _ref$buttonSelectors,
       _ref$buttonContents = _ref.buttonContents,
@@ -55,15 +62,28 @@ function FigureGallery(_ref) {
       _ref$openable = _ref.openable,
       openable = _ref$openable === void 0 ? true : _ref$openable,
       _ref$throwsOpenIndexE = _ref.throwsOpenIndexError,
-      throwsOpenIndexError = _ref$throwsOpenIndexE === void 0 ? false : _ref$throwsOpenIndexE;
+      throwsOpenIndexError = _ref$throwsOpenIndexE === void 0 ? false : _ref$throwsOpenIndexE,
+      _ref$resizePolicy = _ref.resizePolicy,
+      resizePolicy = _ref$resizePolicy === void 0 ? 'CONTENT' : _ref$resizePolicy,
+      _ref$buttonPlacementP = _ref.buttonPlacementPolicy,
+      buttonPlacementPolicy = _ref$buttonPlacementP === void 0 ? 'ALL' : _ref$buttonPlacementP;
+  var BUTTON_PLACEMENT_POLICY = ['ALL', 'NAVIGATORS_ONLY', 'CLOSE_ONLY'];
+  var RESIZE_POLICY = ['CONTENT', 'CONTAINER']; // Type-checks
 
-  // Type-checks
   if (typeof container === 'string') {
     container = document.querySelector(container);
   }
 
   if (!(container instanceof HTMLElement)) {
-    throw new Error('Il contenitore della galleria deve essere un elemento valido.');
+    throw new Error('The gallery container must be a valid DOM element.');
+  }
+
+  if (buttonContainerSelector !== null && BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
+    throw new Error('The specified button placement policy is not defined.');
+  }
+
+  if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
+    throw new Error('The specified resize policy is not defined.');
   } // Shorthand to easily reach `this`.
 
 
@@ -254,7 +274,13 @@ function FigureGallery(_ref) {
     },
     figureClick: function figureClick(e) {
       e.stopImmediatePropagation();
-      that.set(e.target).open(null);
+      var figure = e.target;
+
+      while (figure.tagName !== 'FIGURE') {
+        figure = figure.parentNode;
+      }
+
+      that.set(figure).open(null);
     },
     keyboardNavigation: function keyboardNavigation(e) {
       if (that.isOpen()) {
@@ -331,8 +357,14 @@ function FigureGallery(_ref) {
     if (overlay) {
       var overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
       var ratio = Math.min(1, (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / image.naturalWidth, (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / image.naturalHeight);
-      image.style.width = image.naturalWidth * ratio + 'px';
-      image.style.height = image.naturalHeight * ratio + 'px';
+
+      if (resizePolicy.toUpperCase() === 'CONTENT') {
+        image.style.width = image.naturalWidth * ratio + 'px';
+        image.style.height = image.naturalHeight * ratio + 'px';
+      } else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+        overlay.content.style.width = image.naturalWidth * ratio + 'px';
+        overlay.content.style.height = image.naturalHeight * ratio + 'px';
+      }
     }
   }
   /**
@@ -348,8 +380,14 @@ function FigureGallery(_ref) {
     if (overlay) {
       var overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
       var ratio = Math.min(1, (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / video.videoWidth, (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / video.videoHeight);
-      video.style.width = video.videoWidth * ratio + 'px';
-      video.style.height = video.videoHeight * ratio + 'px';
+
+      if (resizePolicy.toUpperCase() === 'CONTENT') {
+        video.style.width = video.videoWidth * ratio + 'px';
+        video.style.height = video.videoHeight * ratio + 'px';
+      } else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+        overlay.content.style.width = video.videoWidth * ratio + 'px';
+        overlay.content.style.height = video.videoHeight * ratio + 'px';
+      }
     }
   }
   /**
@@ -373,8 +411,14 @@ function FigureGallery(_ref) {
       embed.width = parseInt(embed.getAttribute('data-width'));
       embed.height = parseInt(embed.getAttribute('data-height'));
       var ratio = Math.min((overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / embed.width, (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.height);
-      embed.width = parseInt(embed.width * ratio);
-      embed.height = parseInt(embed.height * ratio);
+
+      if (resizePolicy.toUpperCase() === 'CONTENT') {
+        embed.width = parseInt(embed.width * ratio);
+        embed.height = parseInt(embed.height * ratio);
+      } else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+        overlay.content.style.width = embed.width * ratio + 'px';
+        overlay.content.style.height = embed.height * ratio + 'px';
+      }
     }
   }
   /**
@@ -446,6 +490,20 @@ function FigureGallery(_ref) {
 
       dialog.buttons = {};
 
+      var buttonContainer = function () {
+        if (buttonContainerSelector === null) {
+          return null;
+        }
+
+        var buttonContainerTmp = dialog.querySelector(buttonContainerSelector);
+
+        if (!buttonContainerTmp) {
+          throw new Error("'".concat(buttonContainerSelector, "' must be child of '").concat(overlaySelectors.overlay, "'."));
+        }
+
+        return buttonContainerTmp;
+      }();
+
       for (var type in buttonSelectors) {
         var button = dialog.querySelector(buttonSelectors[type]);
 
@@ -453,7 +511,28 @@ function FigureGallery(_ref) {
           button = document.createElement('button');
           button.classList.add(buttonClasses[type]);
           button.innerHTML = buttonContents[type];
-          dialog.appendChild(button);
+
+          if (buttonContainer === null) {
+            dialog.appendChild(button);
+          } else {
+            if (buttonPlacementPolicy.toUpperCase() === 'ALL') {
+              buttonContainer.appendChild(button);
+            } else {
+              if (buttonPlacementPolicy.toUpperCase() === 'NAVIGATORS_ONLY') {
+                if (type !== 'close') {
+                  buttonContainer.appendChild(button);
+                } else {
+                  dialog.appendChild(button);
+                }
+              } else if (buttonPlacementPolicy.toUpperCase() === 'CLOSE_ONLY') {
+                if (type === 'close') {
+                  buttonContainer.appendChild(button);
+                } else {
+                  dialog.appendChild(button);
+                }
+              }
+            }
+          }
         }
 
         dialog.buttons[type] = button;
@@ -525,8 +604,18 @@ function FigureGallery(_ref) {
         overlay.classList.add(openClass);
       }
 
-      overlay.content.innerHTML = '';
-      overlay.content.appendChild(figureClone);
+      var currFigure = overlay.content.querySelector('figure');
+
+      if (currFigure) {
+        overlay.content.replaceChild(figureClone, currFigure);
+      } else {
+        if (overlay.content.firstChild) {
+          overlay.content.insertBefore(figureClone, overlay.content.firstChild);
+        } else {
+          overlay.content.appendChild(figureClone);
+        }
+      }
+
       setContentSize();
     }
   }
@@ -739,7 +828,7 @@ function FigureGallery(_ref) {
 
       if (throwsOpenIndexError) {
         if (index > figures.length - 1 || Math.abs(index) > figures.length - 1) {
-          throw new Error("L'oggetto ".concat(index, " non \xE8 disponibile."));
+          throw new Error("The element #".concat(index, " cannot be found."));
         }
       } else {
         index = keepInBound(index);
@@ -864,13 +953,13 @@ function FigureGallery(_ref) {
 
   this.set = function (figure) {
     if (!figure) {
-      throw new Error("L'elemento indicato non \xE8 un valore valido. Inserire un numero intero o un elemento DOM.");
+      throw new Error('The given element is not a valid value. Please, insert an integer or a DOM element.');
     }
 
     if (typeof figure === 'number') {
       if (throwsOpenIndexError) {
         if (figure > figures.length - 1 || Math.abs(figure) > figures.length - 1) {
-          throw new Error("L'oggetto ".concat(figure, " non \xE8 disponibile."));
+          throw new Error("The element #".concat(figure, " cannot be found."));
         }
       } else {
         figure = keepInBound(figure);
@@ -879,10 +968,10 @@ function FigureGallery(_ref) {
       figure = figures[figure];
     } else if (figure instanceof HTMLElement) {
       if (getFigureIndex(figure) < 0) {
-        throw new Error("L'elemento indicato non fa parte di questa galleria.");
+        throw new Error('The given element is not in this gallery.');
       }
     } else {
-      throw new Error("L'elemento indicato non \xE8 un valore valido. Inserire un numero intero o un elemento DOM.");
+      throw new Error('The given element is not a valid value. Please, insert an integer or a DOM element.');
     }
 
     var oldCurrent = current;
@@ -961,7 +1050,7 @@ function FigureGallery(_ref) {
 
   this.setOpenable = function (val) {
     if (val == null || typeof val !== 'boolean') {
-      throw new Error('Il valore deve essere di tipo booleano.');
+      throw new Error('The value must be a boolean.');
     }
 
     if (val !== openable) {
@@ -1021,7 +1110,7 @@ function FigureGallery(_ref) {
 
   this.updateFigures = function () {
     var events = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-    figures = contaier.querySelctorAll('figure');
+    figures = container.querySelctorAll('figure');
 
     if (!!events) {
       figures.forEach(function (figure) {
@@ -1068,7 +1157,7 @@ function FigureGallery(_ref) {
   /**
    * Returns the current figure element.
    *
-   * @return  {HTMLElement}
+   * @return  {HTMLElement|null}
   */
 
 
@@ -1078,17 +1167,17 @@ function FigureGallery(_ref) {
   /**
    * Returns the current figure element in the overlay.
    *
-   * @return  {HTMLElement}
+   * @return  {HTMLElement|null}
    */
 
 
   this.getActiveFigure = function () {
-    return overlay.content;
+    return overlay.content.querySelector('figure');
   };
   /**
    * Returns the content of the current figure element in the overlay.
    *
-   * @return  {HTMLElement}
+   * @return  {HTMLElement|null}
    */
 
 

@@ -162,7 +162,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
          *
          * @public
          */
-        const dialog = container.querySelector(overlaySelectors.overlay);
+        let dialog = container.querySelector(overlaySelectors.overlay);
 
         const buttonContainer = (() => {
             if (buttonContainerSelector === null) {
