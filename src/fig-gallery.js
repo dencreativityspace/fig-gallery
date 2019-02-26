@@ -31,7 +31,7 @@
  * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
  * @throws Will throw an error if the `resizePolicy` is invalid.
  *
- * @version 1.4.0
+ * @version 1.4.1
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -463,14 +463,13 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.height
             );
 
-            if (resizePolicy.toUpperCase() === 'CONTENT') {
-                embed.width = parseInt(embed.width * ratio);
-                embed.height = parseInt(embed.height * ratio);
-            }
-            else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+            if (resizePolicy.toUpperCase() === 'CONTAINER') {
                 overlay.content.style.width = (embed.width * ratio) + 'px';
                 overlay.content.style.height = (embed.height * ratio) + 'px';
             }
+
+            embed.width = parseInt(embed.width * ratio);
+            embed.height = parseInt(embed.height * ratio);
         }
     }
 
