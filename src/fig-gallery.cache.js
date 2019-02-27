@@ -27,9 +27,11 @@
  * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
  * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
  * @param {string} [resizePolicy='CONTENT'] Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`.
- * @param {string} [buttonPlacementPolicy='ALL'] If `buttonContainerSelector` isn't `null`, permits to choose which button should be move inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`.
+ * @param {string} [buttonPlacementPolicy='ALL'] If `buttonContainerSelector` isn't `null`, permits to choose which button should be moved inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`.
+ * @param {string} [buttonContainerPlacementPolicy='OUTSIDE_CONTENT'] If `buttonContainerSelector` isn't `null`, permits to choose where button container must be placed. Can be `'OUTSIDE_CONTENT'` or `'INSIDE_CONTENT'`.
  *
  * @throws Will throw an error if the container argument isn't an HTMLElement.
+ * @throws Will throw an error if the `buttonContainerPlacementPolicy` is invalid.
  * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
  * @throws Will throw an error if the `resizePolicy` is invalid.
  *
@@ -37,7 +39,7 @@
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL'}) {
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL', buttonContainerPlacementPolicy = 'OUTSIDE_CONTENT'}) {
     const BUTTON_PLACEMENT_POLICY = [
         'ALL',
         'NAVIGATORS_ONLY',
@@ -49,6 +51,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         'CONTAINER'
     ];
 
+    const BUTTON_CONTAINER_PLACEMENT_POLICY = [
+        'OUTSIDE_CONTENT',
+        'INSIDE_CONTENT'
+    ];
+
     // Type-checks
     if (typeof container === 'string') {
         container = document.querySelector(container);
@@ -58,8 +65,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         throw new Error('The gallery container must be a valid DOM element.');
     }
 
-    if (buttonContainerSelector !== null && BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
-        throw new Error('The specified button placement policy is not defined.');
+    if (buttonContainerSelector !== null) {
+        if (BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
+            throw new Error('The specified button placement policy is not defined.');
+        }
+
+        if (BUTTON_CONTAINER_PLACEMENT_POLICY.indexOf(buttonContainerPlacementPolicy) <= -1) {
+            throw new Error('The specified button container placement policy is not defined.');
+        }
     }
 
     if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
