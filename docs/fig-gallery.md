@@ -2,7 +2,7 @@
 
 ## FigureGallery
 **Kind**: global class  
-**Version**: 1.4.0  
+**Version**: 1.4.1  
 **Author:** Gennaro Landolfi <gennarolandolfi@codedwork.it>  
 
 * [FigureGallery](#FigureGallery)
