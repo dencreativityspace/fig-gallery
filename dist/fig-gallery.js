@@ -27,9 +27,11 @@
  * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
  * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
  * @param {string} [resizePolicy='CONTENT'] Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`.
- * @param {string} [buttonPlacementPolicy='ALL'] If `buttonContainerSelector` isn't `null`, permits to choose which button should be move inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`.
+ * @param {string} [buttonPlacementPolicy='ALL'] If `buttonContainerSelector` isn't `null`, permits to choose which button should be moved inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`.
+ * @param {string} [buttonContainerPlacementPolicy='OUTSIDE_CONTENT'] If `buttonContainerSelector` isn't `null`, permits to choose where button container must be placed. Can be `'OUTSIDE_CONTENT'` or `'INSIDE_CONTENT'`.
  *
  * @throws Will throw an error if the container argument isn't an HTMLElement.
+ * @throws Will throw an error if the `buttonContainerPlacementPolicy` is invalid.
  * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
  * @throws Will throw an error if the `resizePolicy` is invalid.
  *
@@ -65,9 +67,12 @@ function FigureGallery(_ref) {
       _ref$resizePolicy = _ref.resizePolicy,
       resizePolicy = _ref$resizePolicy === void 0 ? 'CONTENT' : _ref$resizePolicy,
       _ref$buttonPlacementP = _ref.buttonPlacementPolicy,
-      buttonPlacementPolicy = _ref$buttonPlacementP === void 0 ? 'ALL' : _ref$buttonPlacementP;
+      buttonPlacementPolicy = _ref$buttonPlacementP === void 0 ? 'ALL' : _ref$buttonPlacementP,
+      _ref$buttonContainerP = _ref.buttonContainerPlacementPolicy,
+      buttonContainerPlacementPolicy = _ref$buttonContainerP === void 0 ? 'OUTSIDE_CONTENT' : _ref$buttonContainerP;
   var BUTTON_PLACEMENT_POLICY = ['ALL', 'NAVIGATORS_ONLY', 'CLOSE_ONLY'];
-  var RESIZE_POLICY = ['CONTENT', 'CONTAINER']; // Type-checks
+  var RESIZE_POLICY = ['CONTENT', 'CONTAINER'];
+  var BUTTON_CONTAINER_PLACEMENT_POLICY = ['OUTSIDE_CONTENT', 'INSIDE_CONTENT']; // Type-checks
 
   if (typeof container === 'string') {
     container = document.querySelector(container);
@@ -77,8 +82,14 @@ function FigureGallery(_ref) {
     throw new Error('The gallery container must be a valid DOM element.');
   }
 
-  if (buttonContainerSelector !== null && BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
-    throw new Error('The specified button placement policy is not defined.');
+  if (buttonContainerSelector !== null) {
+    if (BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
+      throw new Error('The specified button placement policy is not defined.');
+    }
+
+    if (BUTTON_CONTAINER_PLACEMENT_POLICY.indexOf(buttonContainerPlacementPolicy) <= -1) {
+      throw new Error('The specified button container placement policy is not defined.');
+    }
   }
 
   if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
@@ -189,7 +200,9 @@ function FigureGallery(_ref) {
      *
      * @type {HTMLDialogElement|HTMLDivElement|null}
      *
-     * @public
+     * @rivate
+     *
+     * @throws Throws an error when the `buttonContainerSelector` is too complex.
      */
     var dialog = container.querySelector(overlaySelectors.overlay);
 
@@ -198,13 +211,28 @@ function FigureGallery(_ref) {
         return null;
       }
 
-      var buttonContainerTmp = dialog.querySelector(buttonContainerSelector);
+      var tmp = dialog.querySelector(buttonContainerSelector);
 
-      if (!buttonContainerTmp) {
-        throw new Error("'".concat(buttonContainerSelector, "' must be child of '").concat(overlaySelectors.overlay, "'."));
+      if (!tmp) {
+        var selector = buttonContainerSelector.substr(1);
+        tmp = document.createElement('div');
+
+        if (buttonContainerSelector.charAt(0) === '#') {
+          tmp.id = selector;
+        } else if (buttonContainerSelector.charAt(0) === '.') {
+          tmp.classList.add(selector);
+        } else {
+          throw new Error('buttonContainerSelector must be a class or an ID. Complex selector given.');
+        }
+
+        if (buttonContainerPlacementPolicy.toUpperCase() === 'OUTSIDE_CONTENT') {
+          dialog.appendChild(tmp);
+        } else if (buttonContainerPlacementPolicy.toUpperCase() === 'INSIDE_CONTENT') {
+          dialog.content.appendChild(tmp);
+        }
       }
 
-      return buttonContainerTmp;
+      return tmp;
     }();
 
     if (!dialog) {

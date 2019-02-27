@@ -173,7 +173,9 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
          *
          * @type {HTMLDialogElement|HTMLDivElement|null}
          *
-         * @public
+         * @rivate
+         *
+         * @throws Throws an error when the `buttonContainerSelector` is too complex.
          */
         let dialog = container.querySelector(overlaySelectors.overlay);
 
@@ -182,13 +184,32 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 return null;
             }
 
-            const buttonContainerTmp = dialog.querySelector(buttonContainerSelector);
+            let tmp = dialog.querySelector(buttonContainerSelector);
 
-            if (!buttonContainerTmp) {
-                throw new Error(`'${buttonContainerSelector}' must be child of '${overlaySelectors.overlay}'.`);
+            if (!tmp) {
+                const selector = buttonContainerSelector.substr(1);
+
+                tmp = document.createElement('div');
+
+                if (buttonContainerSelector.charAt(0) === '#') {
+                    tmp.id = selector;
+                }
+                else if (buttonContainerSelector.charAt(0) === '.') {
+                    tmp.classList.add(selector);
+                }
+                else {
+                    throw new Error('buttonContainerSelector must be a class or an ID. Complex selector given.');
+                }
+
+                if (buttonContainerPlacementPolicy.toUpperCase() === 'OUTSIDE_CONTENT') {
+                    dialog.appendChild(tmp);
+                }
+                else if (buttonContainerPlacementPolicy.toUpperCase() === 'INSIDE_CONTENT') {
+                    dialog.content.appendChild(tmp);
+                }
             }
 
-            return buttonContainerTmp;
+            return tmp;
         })();
 
         if (!dialog) {
