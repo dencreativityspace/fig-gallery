@@ -293,6 +293,13 @@ function FigureGallery(_ref) {
 
       that.set(figure).open(null);
     },
+    dialogClick: function dialogClick(e) {
+      e.stopImmediatePropagation();
+
+      if (that.isOpen()) {
+        that.close();
+      }
+    },
     keyboardNavigation: function keyboardNavigation(e) {
       if (that.isOpen()) {
         var key = e.which || e.keyCode || 0;
@@ -735,8 +742,9 @@ function FigureGallery(_ref) {
         figures.forEach(function (figure) {
           figure.addEventListener('click', eventCallbacks.figureClick, false);
         });
-      } // Keyboard navigation
+      }
 
+      overlay.addEventListener('click', eventCallbacks.dialogClick, false); // Keyboard navigation
 
       document.addEventListener('keydown', eventCallbacks.keyboardNavigation); // Swipe navigation - since 1.1.0
 
@@ -766,6 +774,7 @@ function FigureGallery(_ref) {
       }
     } else {
       container.removeEventListener('click', eventCallbacks.containerClick, false);
+      overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
       figures.forEach(function (figure) {
         figure.removeEventListener('click', eventCallbacks.figureClick, false);
       });

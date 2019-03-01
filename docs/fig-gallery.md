@@ -6,7 +6,7 @@
 **Author:** Gennaro Landolfi <gennarolandolfi@codedwork.it>  
 
 * [FigureGallery](#FigureGallery)
-    * [new FigureGallery(param, [resizePolicy], [buttonPlacementPolicy])](#new_FigureGallery_new)
+    * [new FigureGallery(param, [resizePolicy], [buttonPlacementPolicy], [buttonContainerPlacementPolicy])](#new_FigureGallery_new)
     * _instance_
         * [.open([index])](#FigureGallery+open) ⇒ <code>this</code>
         * [.prev([cycleState])](#FigureGallery+prev) ⇒ <code>this</code>
@@ -47,12 +47,13 @@
 
 <a name="new_FigureGallery_new"></a>
 
-### new FigureGallery(param, [resizePolicy], [buttonPlacementPolicy])
+### new FigureGallery(param, [resizePolicy], [buttonPlacementPolicy], [buttonContainerPlacementPolicy])
 Gallery that permits to see images or videos at the maximum of their sizesor, at least the maximum that fits in the window respecting ratio.
 
 **Throws**:
 
 - Will throw an error if the container argument isn't an HTMLElement.
+- Will throw an error if the `buttonContainerPlacementPolicy` is invalid.
 - Will throw an error if the `buttonPlacementPolicy` is invalid.
 - Will throw an error if the `resizePolicy` is invalid.
 
@@ -80,7 +81,8 @@ Gallery that permits to see images or videos at the maximum of their sizesor, a
 | [param.openable] | <code>boolean</code> | <code>true</code> | Determines if the gallery can be opened or not. If openable, shows the overlay. |
 | [param.throwsOpenIndexError] | <code>boolean</code> | <code>false</code> | Determines if the gallery has to throw an error when the users tries to navigate beyond the elements. |
 | [resizePolicy] | <code>string</code> | <code>&quot;&#x27;CONTENT&#x27;&quot;</code> | Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`. |
-| [buttonPlacementPolicy] | <code>string</code> | <code>&quot;&#x27;ALL&#x27;&quot;</code> | If `buttonContainerSelector` isn't `null`, permits to choose which button should be move inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`. |
+| [buttonPlacementPolicy] | <code>string</code> | <code>&quot;&#x27;ALL&#x27;&quot;</code> | If `buttonContainerSelector` isn't `null`, permits to choose which button should be moved inside of it. Can be `'ALL'`, `'NAVIGATORS_ONLY'` or `'CLOSE_ONLY'`. |
+| [buttonContainerPlacementPolicy] | <code>string</code> | <code>&quot;&#x27;OUTSIDE_CONTENT&#x27;&quot;</code> | If `buttonContainerSelector` isn't `null`, permits to choose where button container must be placed. Can be `'OUTSIDE_CONTENT'` or `'INSIDE_CONTENT'`. |
 
 <a name="FigureGallery+open"></a>
 

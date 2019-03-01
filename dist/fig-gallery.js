@@ -398,6 +398,13 @@ function FigureGallery(_ref) {
 
       that.set(figure).open(null);
     },
+    dialogClick: function dialogClick(e) {
+      e.stopImmediatePropagation();
+
+      if (that.isOpen()) {
+        that.close();
+      }
+    },
     keyboardNavigation: function keyboardNavigation(e) {
       if (that.isOpen()) {
         var key = e.which || e.keyCode || 0;
@@ -679,6 +686,7 @@ function FigureGallery(_ref) {
     if (openable) {
       // Click on the gallery
       container.addEventListener('click', eventCallbacks.containerClick, false);
+      overlay.addEventListener('click', eventCallbacks.dialogClick, false);
 
       if (forceFigures || !mutation) {
         figures.forEach(function (figure) {
@@ -701,6 +709,7 @@ function FigureGallery(_ref) {
       window.addEventListener('resize', eventCallbacks.resize);
     } else {
       container.removeEventListener('click', eventCallbacks.containerClick, false);
+      overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
       figures.forEach(function (figure) {
         figure.removeEventListener('click', eventCallbacks.figureClick, false);
       });
