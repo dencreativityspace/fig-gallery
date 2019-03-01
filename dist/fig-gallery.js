@@ -401,7 +401,7 @@ function FigureGallery(_ref) {
     dialogClick: function dialogClick(e) {
       e.stopImmediatePropagation();
 
-      if (that.isOpen()) {
+      if (e.target.classList.contains(overlayClasses.overlay) && that.isOpen()) {
         that.close();
       }
     },
