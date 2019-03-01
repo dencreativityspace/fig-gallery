@@ -246,6 +246,13 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
             that.set(figure).open(null);
         },
+        dialogClick: (e) => {
+            e.stopImmediatePropagation();
+
+            if (that.isOpen()) {
+                that.close();
+            }
+        },
         keyboardNavigation: (e) => {
             if (that.isOpen()) {
                 const key = e.which || e.keyCode || 0;
@@ -695,6 +702,8 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 });
             }
 
+            overlay.addEventListener('click', eventCallbacks.dialogClick, false);
+
             // Keyboard navigation
             document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
 
@@ -723,6 +732,8 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
         else {
             container.removeEventListener('click', eventCallbacks.containerClick, false);
+
+            overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
 
             figures.forEach((figure) => {
                 figure.removeEventListener('click', eventCallbacks.figureClick, false);

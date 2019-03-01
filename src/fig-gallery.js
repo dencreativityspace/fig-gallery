@@ -359,6 +359,13 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
             that.set(figure).open(null);
         },
+        dialogClick: (e) => {
+            e.stopImmediatePropagation();
+
+            if (that.isOpen()) {
+                that.close();
+            }
+        },
         keyboardNavigation: (e) => {
             if (that.isOpen()) {
                 const key = e.which || e.keyCode || 0;
@@ -641,6 +648,8 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             // Click on the gallery
             container.addEventListener('click', eventCallbacks.containerClick, false);
 
+            overlay.addEventListener('click', eventCallbacks.dialogClick, false);
+
             if (forceFigures || !mutation) {
                 figures.forEach((figure) => {
                     figure.addEventListener('click', eventCallbacks.figureClick, false);
@@ -665,6 +674,8 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
         else {
             container.removeEventListener('click', eventCallbacks.containerClick, false);
+
+            overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
 
             figures.forEach((figure) => {
                 figure.removeEventListener('click', eventCallbacks.figureClick, false);
