@@ -59,6 +59,7 @@ Gallery that permits to see images or videos at the maximum of their sizesor, a
 - Will throw an error if the `buttonContainerPlacementPolicy` is invalid.
 - Will throw an error if the `buttonPlacementPolicy` is invalid.
 - Will throw an error if the `resizePolicy` is invalid.
+- Will throw an error if the `buttonsOrder` doesn't include all the buttons.
 
 
 | Param | Type | Default | Description |
@@ -77,6 +78,7 @@ Gallery that permits to see images or videos at the maximum of their sizesor, a
 | [param.buttonContents.close] | <code>string</code> | <code>&quot;&#x27;&amp;times;&#x27;&quot;</code> | Content for the 'close' button. |
 | [param.buttonContents.prev] | <code>string</code> | <code>&quot;&#x27;&amp;lang;&#x27;&quot;</code> | Content for the 'previous' button. |
 | [param.buttonContents.next] | <code>string</code> | <code>&quot;&#x27;&amp;rang;&#x27;&quot;</code> | Content for the 'next' button. |
+| [param.buttonsOrder] | <code>array</code> | <code>[&#x27;prev&#x27;, &#x27;next&#x27;, &#x27;close&#x27;]</code> | Orders of the buttons. |
 | [param.overlaySelectors] | <code>object</code> | <code>{}</code> | Selectors for the overlay elements. |
 | [param.overlaySelectors.overlay] | <code>string</code> | <code>&quot;&#x27;.overlay&#x27;&quot;</code> | Selector for the overlay element. |
 | [param.overlaySelectors.content] | <code>string</code> | <code>&quot;&#x27;.overlay-content&#x27;&quot;</code> | Selector content of the overlay element. |

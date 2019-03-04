@@ -20,6 +20,7 @@
  * @param {string} [param.buttonContents.close='&times;'] Content for the 'close' button.
  * @param {string} [param.buttonContents.prev='&lang;'] Content for the 'previous' button.
  * @param {string} [param.buttonContents.next='&rang;'] Content for the 'next' button.
+ * @param {array} [param.buttonsOrder=['prev', 'next', 'close']] Orders of the buttons.
  * @param {object} [param.overlaySelectors={}] Selectors for the overlay elements.
  * @param {string} [param.overlaySelectors.overlay='.overlay'] Selector for the overlay element.
  * @param {string} [param.overlaySelectors.content='.overlay-content'] Selector content of the overlay element.
@@ -34,6 +35,7 @@
  * @throws Will throw an error if the `buttonContainerPlacementPolicy` is invalid.
  * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
  * @throws Will throw an error if the `resizePolicy` is invalid.
+ * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
  * @version 1.4.1
  *
@@ -56,6 +58,8 @@ function FigureGallery(_ref) {
       buttonSelectors = _ref$buttonSelectors === void 0 ? {} : _ref$buttonSelectors,
       _ref$buttonContents = _ref.buttonContents,
       buttonContents = _ref$buttonContents === void 0 ? {} : _ref$buttonContents,
+      _ref$buttonsOrder = _ref.buttonsOrder,
+      buttonsOrder = _ref$buttonsOrder === void 0 ? ['prev', 'next', 'close'] : _ref$buttonsOrder,
       _ref$cycle = _ref.cycle,
       cycle = _ref$cycle === void 0 ? true : _ref$cycle,
       _ref$overlaySelectors = _ref.overlaySelectors,
@@ -94,6 +98,10 @@ function FigureGallery(_ref) {
 
   if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
     throw new Error('The specified resize policy is not defined.');
+  }
+
+  if (buttonsOrder.length !== 3 || buttonsOrder.indexOf('prev') === -1 && buttonsOrder.indexOf('prev') === -1 && buttonsOrder.indexOf('close') === -1) {
+    throw new Error("The given order doesn't include all the buttons.");
   } // Shorthand to easily reach `this`.
 
 
@@ -263,7 +271,7 @@ function FigureGallery(_ref) {
 
     dialog.buttons = {};
 
-    for (var type in buttonSelectors) {
+    for (var type in buttonsOrder) {
       var button = dialog.querySelector(buttonSelectors[type]);
 
       if (!button) {

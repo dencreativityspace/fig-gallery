@@ -18,6 +18,7 @@
  * @param {string} [param.buttonContents.close='&times;'] Content for the 'close' button.
  * @param {string} [param.buttonContents.prev='&lang;'] Content for the 'previous' button.
  * @param {string} [param.buttonContents.next='&rang;'] Content for the 'next' button.
+ * @param {array} [param.buttonsOrder=['prev', 'next', 'close']] Orders of the buttons.
  * @param {object} [param.overlaySelectors={}] Selectors for the overlay elements.
  * @param {string} [param.overlaySelectors.overlay='.overlay'] Selector for the overlay element.
  * @param {string} [param.overlaySelectors.content='.overlay-content'] Selector content of the overlay element.
@@ -32,12 +33,13 @@
  * @throws Will throw an error if the `buttonContainerPlacementPolicy` is invalid.
  * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
  * @throws Will throw an error if the `resizePolicy` is invalid.
+ * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
  * @version 1.4.1
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL', buttonContainerPlacementPolicy = 'OUTSIDE_CONTENT'}) {
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, buttonsOrder = ['prev', 'next', 'close'], cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL', buttonContainerPlacementPolicy = 'OUTSIDE_CONTENT'}) {
     const BUTTON_PLACEMENT_POLICY = [
         'ALL',
         'NAVIGATORS_ONLY',
@@ -75,6 +77,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
 
     if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
         throw new Error('The specified resize policy is not defined.');
+    }
+
+    if (buttonsOrder.length !== 3 || (buttonsOrder.indexOf('prev') === -1 && buttonsOrder.indexOf('prev') === -1 && buttonsOrder.indexOf('close') === -1)) {
+        throw new Error(`The given order doesn't include all the buttons.`);
     }
 
     // Shorthand to easily reach `this`.
@@ -241,7 +247,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
          */
         dialog.buttons = {};
 
-        for (const type in buttonSelectors) {
+        for (const type in buttonsOrder) {
             let button = dialog.querySelector(buttonSelectors[type]);
 
             if (!button) {

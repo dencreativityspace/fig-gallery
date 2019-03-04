@@ -21,6 +21,7 @@
  * @param {string} [param.buttonContents.close='&times;'] Content for the 'close' button.
  * @param {string} [param.buttonContents.prev='&lang;'] Content for the 'previous' button.
  * @param {string} [param.buttonContents.next='&rang;'] Content for the 'next' button.
+ * @param {array} [param.buttonsOrder=['prev', 'next', 'close']] Orders of the buttons.
  * @param {object} [param.overlaySelectors={}] Selectors for the overlay elements.
  * @param {string} [param.overlaySelectors.overlay='.overlay'] Selector for the overlay element.
  * @param {string} [param.overlaySelectors.content='.overlay-content'] Selector content of the overlay element.
@@ -35,6 +36,7 @@
  * @throws Will throw an error if the `buttonContainerPlacementPolicy` is invalid.
  * @throws Will throw an error if the `buttonPlacementPolicy` is invalid.
  * @throws Will throw an error if the `resizePolicy` is invalid.
+ * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
  * @version 1.4.1
  *
@@ -57,6 +59,8 @@ function FigureGallery(_ref) {
       buttonSelectors = _ref$buttonSelectors === void 0 ? {} : _ref$buttonSelectors,
       _ref$buttonContents = _ref.buttonContents,
       buttonContents = _ref$buttonContents === void 0 ? {} : _ref$buttonContents,
+      _ref$buttonsOrder = _ref.buttonsOrder,
+      buttonsOrder = _ref$buttonsOrder === void 0 ? ['prev', 'next', 'close'] : _ref$buttonsOrder,
       _ref$cycle = _ref.cycle,
       cycle = _ref$cycle === void 0 ? true : _ref$cycle,
       _ref$overlaySelectors = _ref.overlaySelectors,
@@ -95,6 +99,10 @@ function FigureGallery(_ref) {
 
   if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
     throw new Error('The specified resize policy is not defined.');
+  }
+
+  if (buttonsOrder.length !== 3 || buttonsOrder.indexOf('prev') === -1 && buttonsOrder.indexOf('prev') === -1 && buttonsOrder.indexOf('close') === -1) {
+    throw new Error("The given order doesn't include all the buttons.");
   } // Shorthand to easily reach `this`.
 
 
@@ -539,40 +547,60 @@ function FigureGallery(_ref) {
         return tmp;
       }();
 
-      for (var type in buttonSelectors) {
-        var button = dialog.querySelector(buttonSelectors[type]);
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
 
-        if (!button) {
-          button = document.createElement('button');
-          button.classList.add(buttonClasses[type]);
-          button.innerHTML = buttonContents[type];
+      try {
+        for (var _iterator2 = buttonsOrder[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var type = _step2.value;
+          var button = dialog.querySelector(buttonSelectors[type]);
 
-          if (buttonContainer === null) {
-            dialog.appendChild(button);
-          } else {
-            if (buttonPlacementPolicy.toUpperCase() === 'ALL') {
-              buttonContainer.appendChild(button);
+          if (!button) {
+            button = document.createElement('button');
+            button.classList.add(buttonClasses[type]);
+            button.innerHTML = buttonContents[type];
+
+            if (buttonContainer === null) {
+              dialog.appendChild(button);
             } else {
-              if (buttonPlacementPolicy.toUpperCase() === 'NAVIGATORS_ONLY') {
-                if (type !== 'close') {
-                  buttonContainer.appendChild(button);
-                } else {
-                  dialog.appendChild(button);
-                }
-              } else if (buttonPlacementPolicy.toUpperCase() === 'CLOSE_ONLY') {
-                if (type === 'close') {
-                  buttonContainer.appendChild(button);
-                } else {
-                  dialog.appendChild(button);
+              if (buttonPlacementPolicy.toUpperCase() === 'ALL') {
+                buttonContainer.appendChild(button);
+              } else {
+                if (buttonPlacementPolicy.toUpperCase() === 'NAVIGATORS_ONLY') {
+                  if (type !== 'close') {
+                    buttonContainer.appendChild(button);
+                  } else {
+                    dialog.appendChild(button);
+                  }
+                } else if (buttonPlacementPolicy.toUpperCase() === 'CLOSE_ONLY') {
+                  if (type === 'close') {
+                    buttonContainer.appendChild(button);
+                  } else {
+                    dialog.appendChild(button);
+                  }
                 }
               }
             }
           }
+
+          dialog.buttons[type] = button;
+        } // Utility to get the content of the current figure.
+
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
         }
-
-        dialog.buttons[type] = button;
-      } // Utility to get the content of the current figure.
-
+      }
 
       dialog.getContent = function () {
         return dialog.content.querySelector('img, video, object, embed, iframe');
