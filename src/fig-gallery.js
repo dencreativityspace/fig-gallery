@@ -23,6 +23,7 @@
  * @param {string} [param.overlaySelectors.overlay='.overlay'] Selector for the overlay element.
  * @param {string} [param.overlaySelectors.content='.overlay-content'] Selector content of the overlay element.
  * @param {boolean} [param.cycle=true] Determines if the gallery can cycle when reaches the end-points.
+ * @param {boolean} [param.swipe=false] Determines if the gallery can be navigated with swipes.
  * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
  * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
  * @param {string} [resizePolicy='CONTENT'] Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`.
@@ -39,7 +40,7 @@
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, buttonsOrder = ['prev', 'next', 'close'], cycle = true, overlaySelectors = {}, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL', buttonContainerPlacementPolicy = 'OUTSIDE_CONTENT'}) {
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, buttonsOrder = ['prev', 'next', 'close'], cycle = true, overlaySelectors = {}, swipe = false, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL', buttonContainerPlacementPolicy = 'OUTSIDE_CONTENT'}) {
     const BUTTON_PLACEMENT_POLICY = [
         'ALL',
         'NAVIGATORS_ONLY',
@@ -328,14 +329,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
     */
     const swipeHandler = (() => {
-        if (typeof SwipeEvent === 'function') {
-            const swipe = new SwipeEvent({
+        if (swipe && typeof SwipeEvent === 'function') {
+            const swipeEvent = new SwipeEvent({
                 element: container,
                 itemSelector: 'figure',
                 activeSelector: currentSelector
             });
 
-            return swipe;
+            return swipeEvent;
         }
 
         return null;

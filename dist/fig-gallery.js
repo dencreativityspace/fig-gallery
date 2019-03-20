@@ -25,6 +25,7 @@
  * @param {string} [param.overlaySelectors.overlay='.overlay'] Selector for the overlay element.
  * @param {string} [param.overlaySelectors.content='.overlay-content'] Selector content of the overlay element.
  * @param {boolean} [param.cycle=true] Determines if the gallery can cycle when reaches the end-points.
+ * @param {boolean} [param.swipe=false] Determines if the gallery can be navigated with swipes.
  * @param {boolean} [param.openable=true] Determines if the gallery can be opened or not. If openable, shows the overlay.
  * @param {boolean} [param.throwsOpenIndexError=false] Determines if the gallery has to throw an error when the users tries to navigate beyond the elements.
  * @param {string} [resizePolicy='CONTENT'] Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`.
@@ -64,6 +65,8 @@ function FigureGallery(_ref) {
       cycle = _ref$cycle === void 0 ? true : _ref$cycle,
       _ref$overlaySelectors = _ref.overlaySelectors,
       overlaySelectors = _ref$overlaySelectors === void 0 ? {} : _ref$overlaySelectors,
+      _ref$swipe = _ref.swipe,
+      swipe = _ref$swipe === void 0 ? false : _ref$swipe,
       _ref$openable = _ref.openable,
       openable = _ref$openable === void 0 ? true : _ref$openable,
       _ref$throwsOpenIndexE = _ref.throwsOpenIndexError,
@@ -370,13 +373,13 @@ function FigureGallery(_ref) {
 
 
   var swipeHandler = function () {
-    if (typeof SwipeEvent === 'function') {
-      var swipe = new SwipeEvent({
+    if (swipe && typeof SwipeEvent === 'function') {
+      var swipeEvent = new SwipeEvent({
         element: container,
         itemSelector: 'figure',
         activeSelector: currentSelector
       });
-      return swipe;
+      return swipeEvent;
     }
 
     return null;
