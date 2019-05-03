@@ -746,7 +746,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @param   {?number}   [index=0]   Index of the element to be shown.
      *                                  If is null gets the current figure.
      *
-     * @emits FigureGallery#opened
+     * @emits FigureGallery#fig-gallery:opened
      *
      * @return  {this}
      *
@@ -783,20 +783,30 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let openedEvent = null;
 
         if (typeof window.CustomEvent !== 'function') {
-            openedEvent = document.createEvent('opened');
+            openedEvent = document.createEvent('fig-gallery:opened');
 
-             openedEvent.initCustomEvent('opened', false, false, {
-                current: current
+             openedEvent.initCustomEvent('fig-gallery:opened', false, false, {
+                 current: current,
+                 active: that.getActiveFigure()
             });
         }
         else {
-            openedEvent = new CustomEvent('opened', {
+            openedEvent = new CustomEvent('fig-gallery:opened', {
                 detail: {
-                    current: current
+                    current: current,
+                    active: that.getActiveFigure()
                 }
             });
         }
 
+        /**
+         * Event triggered when the gallery gets opened.
+         *
+         * @event FigureGallery#fig-gallery:opened
+         * @type {object}
+         * @property {HTMLElement} current - Current active <figure> element in container.
+         * @property {HTMLElement} active - Active <figure> element in overlay.
+         */
         container.dispatchEvent(openedEvent);
 
         return this;
@@ -807,7 +817,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      *
      * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
      *
-     * @emits FigureGallery#prev
+     * @emits FigureGallery#fig-gallery:prev
      *
      * @return  {this}
     */
@@ -819,22 +829,33 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let prevEvent = null;
 
         if (typeof window.CustomEvent !== 'function') {
-            prevEvent = document.createEvent('prev');
+            prevEvent = document.createEvent('fig-gallery:prev');
 
-             prevEvent.initCustomEvent('prev', false, false, {
-                current: current,
-                next: oldCurrent
+             prevEvent.initCustomEvent('fig-gallery:prev', false, false, {
+                 current: current,
+                 next: oldCurrent,
+                 active: that.getActiveFigure()
             });
         }
         else {
-            prevEvent = new CustomEvent('prev', {
+            prevEvent = new CustomEvent('fig-gallery:prev', {
                 detail: {
                     current: current,
-                    next: oldCurrent
+                    next: oldCurrent,
+                    active: that.getActiveFigure()
                 }
             });
         }
 
+        /**
+         * Event triggered when the gallery gets navigated to the previous element.
+         *
+         * @event FigureGallery#fig-gallery:prev
+         * @type {object}
+         * @property {HTMLElement} current - Current active <figure> element in container.
+         * @property {HTMLElement} next - Old active <figure> element in container which succeeds the current.
+         * @property {HTMLElement} active - Active <figure> element in overlay.
+         */
         container.dispatchEvent(prevEvent);
 
         return this;
@@ -845,7 +866,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      *
      * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
      *
-     * @emits FigureGallery#next
+     * @emits FigureGallery#fig-gallery:next
      *
      * @return  {this}
     */
@@ -857,22 +878,33 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let nextEvent = null;
 
         if (typeof window.CustomEvent !== 'function') {
-            nextEvent = document.createEvent('next');
+            nextEvent = document.createEvent('fig-gallery:next');
 
-             nextEvent.initCustomEvent('next', false, false, {
-                current: current,
-                prev: oldCurrent
+             nextEvent.initCustomEvent('fig-gallery:next', false, false, {
+                 current: current,
+                 prev: oldCurrent,
+                 active: that.getActiveFigure()
             });
         }
         else {
-            nextEvent = new CustomEvent('next', {
+            nextEvent = new CustomEvent('fig-gallery:next', {
                 detail: {
                     current: current,
-                    prev: oldCurrent
+                    prev: oldCurrent,
+                    active: that.getActiveFigure()
                 }
             });
         }
 
+        /**
+         * Event triggered when the gallery gets navigated to the next element.
+         *
+         * @event FigureGallery#fig-gallery:next
+         * @type {object}
+         * @property {HTMLElement} current - Current active <figure> element in container.
+         * @property {HTMLElement} prev - Old active <figure> element in container which precedes the current.
+         * @property {HTMLElement} active - Active <figure> element in overlay.
+         */
         container.dispatchEvent(nextEvent);
 
         return this;
@@ -885,7 +917,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      *                                          element itself to bet setted as
      *                                          current.
      *
-     * @emits FigureGallery#setted
+     * @emits FigureGallery#fig-gallery:setted
      *
      * @return  {this}
      *
@@ -928,22 +960,33 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let settedEvent = null;
 
         if (typeof window.CustomEvent !== 'function') {
-            settedEvent = document.createEvent('setted');
+            settedEvent = document.createEvent('fig-gallery:setted');
 
-             settedEvent.initCustomEvent('setted', false, false, {
-                current: current,
-                old: oldCurrent
+             settedEvent.initCustomEvent('fig-gallery:setted', false, false, {
+                 current: current,
+                 old: oldCurrent,
+                 active: that.getActiveFigure()
             });
         }
         else {
-            settedEvent = new CustomEvent('setted', {
+            settedEvent = new CustomEvent('fig-gallery:setted', {
                 detail: {
                     current: current,
-                    old: oldCurrent
+                    old: oldCurrent,
+                    active: that.getActiveFigure()
                 }
             });
         }
 
+        /**
+         * Event triggered when the gallery gets setted on a specific element.
+         *
+         * @event FigureGallery#fig-gallery:setted
+         * @type {object}
+         * @property {HTMLElement} current - Current active <figure> element in container.
+         * @property {HTMLElement} old - Old active <figure> element in container.
+         * @property {HTMLElement} active - Active <figure> element in overlay.
+         */
         container.dispatchEvent(settedEvent);
 
         return this;
@@ -952,7 +995,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     /**
      * Closes the overlay.
      *
-     * @emits FigureGallery#closed
+     * @emits FigureGallery#fig-gallery:closed
      *
      * @return  {this}
     */
@@ -971,20 +1014,29 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let closedEvent = null;
 
         if (typeof window.CustomEvent !== 'function') {
-            closedEvent = document.createEvent('closed');
+            closedEvent = document.createEvent('fig-gallery:closed');
 
-             closedEvent.initCustomEvent('closed', false, false, {
-                current: current
+             closedEvent.initCustomEvent('fig-gallery:closed', false, false, {
+                 current: current,
+                 active: that.getActiveFigure()
             });
         }
         else {
-            closedEvent = new CustomEvent('closed', {
+            closedEvent = new CustomEvent('fig-gallery:closed', {
                 detail: {
-                    current: current
+                    current: current,
+                    active: that.getActiveFigure()
                 }
             });
         }
 
+        /**
+         * Event triggered when the gallery gets closed.
+         *
+         * @event FigureGallery#fig-gallery:closed
+         * @type {object}
+         * @property {HTMLElement} current - Current active <figure> element in container.
+         */
         container.dispatchEvent(closedEvent);
 
         return this;
@@ -995,7 +1047,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      *
      * @param   {boolean}   val
      *
-     * @emits FigureGallery#openablechange
+     * @emits FigureGallery#fig-gallery:openablechange
      *
      * @return  {this}
      *
@@ -1023,20 +1075,27 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             let openablechangeEvent = null;
 
             if (typeof window.CustomEvent !== 'function') {
-                openablechangeEvent = document.createEvent('openablechange');
+                openablechangeEvent = document.createEvent('fig-gallery:openablechange');
 
-                 openablechangeEvent.initCustomEvent('openablechange', false, false, {
+                 openablechangeEvent.initCustomEvent('fig-gallery:openablechange', false, false, {
                     openable: val
                 });
             }
             else {
-                openablechangeEvent = new CustomEvent('openablechange', {
+                openablechangeEvent = new CustomEvent('fig-gallery:openablechange', {
                     detail: {
                         openable: val
                     }
                 });
             }
 
+            /**
+             * Event triggered when the gallery gets updated if openable or not.
+             *
+             * @event FigureGallery#fig-gallery:openablechange
+             * @type {object}
+             * @property {boolean} openable - Gets the current openable state.
+             */
             container.dispatchEvent(openablechangeEvent);
         }
 
