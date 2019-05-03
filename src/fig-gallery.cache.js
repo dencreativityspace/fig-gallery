@@ -204,13 +204,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     */
     const swipeHandler = (() => {
         if (swipe && typeof SwipeEvent === 'function') {
-            const swipeEvent = new SwipeEvent({
+            return new SwipeEvent({
                 element: container,
                 itemSelector: 'figure',
                 activeSelector: currentSelector
             });
-
-            return swipeEvent;
         }
 
         return null;
