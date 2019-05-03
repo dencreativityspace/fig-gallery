@@ -177,7 +177,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         let dialog = container.querySelector(overlaySelectors.overlay);
 
         const buttonContainer = (() => {
-            if (buttonContainerSelector === null) {
+            if (buttonContainerSelector == null) {
                 return null;
             }
 
@@ -338,7 +338,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     * @private
     */
     const eventCallbacks = {
-        containerClick: (e) => {
+        containerClick: () => {
             if (!that.isOpen()) {
                 that.open(null);
             }
@@ -708,7 +708,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      */
     const mutation = (() => {
         if ('MutationObserver' in window) {
-            const m = new MutationObserver((mutations, observer) => {
+            const m = new MutationObserver((mutations) => {
                 mutations.forEach((mut) => {
                     if (mut.type === 'childList') {
                         figures = container.querySelectorAll('figure');
@@ -881,7 +881,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     /**
      * Sets the current `<figure>`.
      *
-     * @param   {number|HTMLElement}   figure   Index of the element or the
+     * @param   {number|HTMLElement|Node}   figure   Index of the element or the
      *                                          element itself to bet setted as
      *                                          current.
      *
@@ -1053,7 +1053,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
     */
     this.updateFigures = (events = true) => {
-        figures = container.querySelctorAll('figure');
+        figures = container.querySelectorAll('figure');
 
         if (!!events) {
             figures.forEach((figure) => {

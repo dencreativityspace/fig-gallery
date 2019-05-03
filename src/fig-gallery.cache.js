@@ -463,7 +463,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             dialog.buttons = {};
 
             const buttonContainer = (() => {
-                if (buttonContainerSelector === null) {
+                if (buttonContainerSelector == null) {
                     return null;
                 }
 
@@ -762,7 +762,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      */
     let mutation = (() => {
         if ('MutationObserver' in window) {
-            const m = new MutationObserver((mutations, observer) => {
+            const m = new MutationObserver((mutations) => {
                 mutations.forEach((mut) => {
                     if (mut.type === 'childList') {
                         figures = container.querySelectorAll('figure');
@@ -1049,14 +1049,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      *
      * @param   {boolean}   val
      *
-     * @emits FigureGallery#openablechange
+     * @emits FigureGallery#fig-gallery:openablechange
      *
      * @return  {this}
      *
      * @throws Will throw an error if the argument is null or isn't a boolean.
     */
     this.setOpenable = (val) => {
-        if (val  == null || typeof val !== 'boolean') {
+        if (!val || typeof val !== 'boolean') {
             throw new Error('The value must be a boolean.');
         }
 
@@ -1117,7 +1117,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
     */
     this.updateFigures = (events = true) => {
-        figures = container.querySelctorAll('figure');
+        figures = container.querySelectorAll('figure');
 
         if (!!events) {
             figures.forEach((figure) => {
