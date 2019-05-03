@@ -42,23 +42,7 @@
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, buttonsOrder = ['prev', 'next', 'close'], cycle = true, overlaySelectors = {}, swipe = false, openable = true, throwsOpenIndexError = false, resizePolicy = 'CONTENT', buttonPlacementPolicy = 'ALL', buttonContainerPlacementPolicy = 'OUTSIDE_CONTENT'}) {
-    const BUTTON_PLACEMENT_POLICY = [
-        'ALL',
-        'NAVIGATORS_ONLY',
-        'CLOSE_ONLY'
-    ];
-
-    const RESIZE_POLICY = [
-        'CONTENT',
-        'CONTAINER'
-    ];
-
-    const BUTTON_CONTAINER_PLACEMENT_POLICY = [
-        'OUTSIDE_CONTENT',
-        'INSIDE_CONTENT'
-    ];
-
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, buttonsOrder = ['prev', 'next', 'close'], cycle = true, overlaySelectors = {}, swipe = false, openable = true, throwsOpenIndexError = false, resizePolicy = RESIZE_POLICY.CONTENT, buttonPlacementPolicy = BUTTON_PLACEMENT_POLICY.ALL, buttonContainerPlacementPolicy = BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT}) {
     // Type-checks
     if (typeof container === 'string') {
         container = document.querySelector(container);
@@ -68,17 +52,17 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         throw new Error('The gallery container must be a valid DOM element.');
     }
 
-    if (buttonContainerSelector !== null) {
-        if (BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
+    if (buttonContainerSelector != null) {
+        if (!BUTTON_PLACEMENT_POLICY[buttonPlacementPolicy]) {
             throw new Error('The specified button placement policy is not defined.');
         }
 
-        if (BUTTON_CONTAINER_PLACEMENT_POLICY.indexOf(buttonContainerPlacementPolicy) <= -1) {
+        if (!BUTTON_CONTAINER_PLACEMENT_POLICY[buttonContainerPlacementPolicy]) {
             throw new Error('The specified button container placement policy is not defined.');
         }
     }
 
-    if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
+    if (!RESIZE_POLICY[resizePolicy]) {
         throw new Error('The specified resize policy is not defined.');
     }
 
@@ -332,11 +316,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / image.naturalHeight
             );
 
-            if (resizePolicy.toUpperCase() === 'CONTENT') {
+            if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTENT) {
                 image.style.width = (image.naturalWidth * ratio) + 'px';
                 image.style.height = (image.naturalHeight * ratio) + 'px';
             }
-            else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+            else if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
                 overlay.content.style.width = (image.naturalWidth * ratio) + 'px';
                 overlay.content.style.height = (image.naturalHeight * ratio) + 'px';
             }
@@ -360,11 +344,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / video.videoHeight
             );
 
-            if (resizePolicy.toUpperCase() === 'CONTENT') {
+            if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTENT) {
                 video.style.width = (video.videoWidth * ratio) + 'px';
                 video.style.height = (video.videoHeight * ratio) + 'px';
             }
-            else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+            else if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
                 overlay.content.style.width = (video.videoWidth * ratio) + 'px';
                 overlay.content.style.height = (video.videoHeight * ratio) + 'px';
             }
@@ -398,7 +382,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.height
             );
 
-            if (resizePolicy.toUpperCase() === 'CONTAINER') {
+            if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
                 overlay.content.style.width = (embed.width * ratio) + 'px';
                 overlay.content.style.height = (embed.height * ratio) + 'px';
             }
@@ -499,10 +483,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                         throw new Error('buttonContainerSelector must be a class or an ID. Complex selector given.');
                     }
 
-                    if (buttonContainerPlacementPolicy.toUpperCase() === 'OUTSIDE_CONTENT') {
+                    if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT) {
                         dialog.appendChild(tmp);
                     }
-                    else if (buttonContainerPlacementPolicy.toUpperCase() === 'INSIDE_CONTENT') {
+                    else if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.INSIDE_CONTENT) {
                         dialog.content.appendChild(tmp);
                     }
                 }
@@ -523,11 +507,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                         dialog.appendChild(button);
                     }
                     else {
-                        if (buttonPlacementPolicy.toUpperCase() === 'ALL') {
+                        if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.ALL) {
                             buttonContainer.appendChild(button);
                         }
                         else {
-                            if (buttonPlacementPolicy.toUpperCase() === 'NAVIGATORS_ONLY') {
+                            if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.NAVIGATORS_ONLY) {
                                 if (type !== 'close') {
                                     buttonContainer.appendChild(button);
                                 }
@@ -535,7 +519,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                                     dialog.appendChild(button);
                                 }
                             }
-                            else if (buttonPlacementPolicy.toUpperCase() === 'CLOSE_ONLY') {
+                            else if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.CLOSE_ONLY) {
                                 if (type === 'close') {
                                     buttonContainer.appendChild(button);
                                 }
@@ -1210,3 +1194,22 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         return swipeHandler;
     };
 }
+
+var BUTTON_CONTAINER_PLACEMENT_POLICY = {
+    OUTSIDE_CONTENT: 'OUTSIDE_CONTENT',
+    INSIDE_CONTENT: 'INSIDE_CONTENT'
+};
+Object.freeze(BUTTON_CONTAINER_PLACEMENT_POLICY);
+
+var BUTTON_PLACEMENT_POLICY = {
+    ALL: 'ALL',
+    NAVIGATORS_ONLY: 'NAVIGATORS_ONLY',
+    CLOSE_ONLY: 'CLOSE_ONLY'
+};
+Object.freeze(BUTTON_PLACEMENT_POLICY);
+
+var RESIZE_POLICY = {
+    CONTENT: 'CONTENT',
+    CONTAINER: 'CONTAINER'
+};
+Object.freeze(RESIZE_POLICY);
