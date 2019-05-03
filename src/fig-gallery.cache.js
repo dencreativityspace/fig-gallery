@@ -1,4 +1,3 @@
-
 /**
  * Gallery that permits to see images or videos at the maximum of their sizes
  * or, at least the maximum that fits in the window respecting ratio.
@@ -38,7 +37,7 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.4.1
+ * @version 1.7.0
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -113,7 +112,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     const currentClass = currentSelector.substr(1);
 
     /**
-     * Object containining the CSS classes that get applied to the buttons of the overlay.
+     * Object containing the CSS classes that get applied to the buttons of the overlay.
      *
      * @constant
      * @enum {string}
@@ -127,7 +126,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     };
 
     /**
-     * Object containining the CSS classes that get applied to the overlay.
+     * Object containing the CSS classes that get applied to the overlay.
      *
      * @constant
      * @enum {string}
@@ -147,7 +146,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     /**
      * Gets all the <figure> elements children of container.
      *
-     * @type {HTMLElement[]}
+     * @type {NodeList}
      *
      * @private
      */
@@ -166,6 +165,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     * Represents the overlay element.
     *
     * @type {HTMLDialogElement|HTMLDivElement}
+    *
+    * @property {object} buttons - Contains the buttons contained in the overlay.
+    * @property {HTMLElement} content - Contains the content container.
+    * @method content.getContent() - Gets the content of overlay.content.
     *
     * @private
     *
@@ -564,7 +567,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     /**
      * Sets the given figure as current.
      *
-     * @param {HTMLElement} figure
+     * @param {HTMLElement|Node} figure
      *
      * @private
      */
@@ -702,8 +705,8 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             if (swipeHandler) {
                 swipeHandler.attach();
                 /**
-                 * @listens swipe-event#swipe
-                 * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+                 * @listens SwipeEvent#swipe
+                 * @see {@link https://github.com/dencreativityspace/swipe-event|SwipeEvent}
                  */
                 document.addEventListener('swipe', eventCallbacks.swipeNavigation);
             }
@@ -934,11 +937,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     /**
      * Sets the current `<figure>`.
      *
-     * @param   {number|HTMLElement}   figure   Index of the element or the
+     * @param   {number|HTMLElement|Node}   figure   Index of the element or the
      *                                          element itself to bet setted as
      *                                          current.
      *
-     * @emits FigureGallery#setted
+     * @emits FigureGallery#fig-gallery:setted
      *
      * @return  {this}
      *

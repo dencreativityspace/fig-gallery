@@ -36,7 +36,7 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.4.1
+ * @version 1.7.0
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -111,7 +111,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     const currentClass = currentSelector.substr(1);
 
     /**
-     * Object containining the CSS classes that get applied to the buttons of the overlay.
+     * Object containing the CSS classes that get applied to the buttons of the overlay.
      *
      * @constant
      * @enum {string}
@@ -125,7 +125,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     };
 
     /**
-     * Object containining the CSS classes that get applied to the overlay.
+     * Object containing the CSS classes that get applied to the overlay.
      *
      * @constant
      * @enum {string}
@@ -145,7 +145,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     /**
      * Gets all the <figure> elements children of container.
      *
-     * @type {HTMLElement[]}
+     * @type {NodeList}
      *
      * @private
      */
@@ -156,13 +156,19 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     *
     * @type {HTMLDialogElement|HTMLDivElement}
     *
+    * @property {object} buttons - Contains the buttons contained in the overlay.
+    * @property {HTMLElement} content - Contains the content container.
+    * @method content.getContent() - Gets the content of overlay.content.
+    *
     * @private
     */
     let overlay = (() => {
         /**
-         * Refers to the .`overlay` element.
+         * Refers to the `.overlay` element.
          *
-         * @type {HTMLDialogElement|HTMLDivElement|null}
+         * @type {HTMLElement|null}
+         *
+         * @property {HTMLElement} content - Contains the content container.
          *
          * @rivate
          *
@@ -224,7 +230,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         }
 
         /**
-         * Object containining the buttons in the overlay.
+         * Object containing the buttons in the overlay.
          *
          * @enum {HTMLButtonElement}
          *
@@ -552,7 +558,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     /**
      * Sets the given figure as current.
      *
-     * @param {HTMLElement} figure
+     * @param {HTMLElement|Node} figure
      *
      * @private
      */
@@ -653,8 +659,8 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             // Swipe navigation - since 1.1.0
             if (swipeHandler) {
                 /**
-                 * @listens swipe-event#swipe
-                 * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+                 * @listens SwipeEvent#swipe
+                 * @see {@link https://github.com/dencreativityspace/swipe-event|SwipeEvent}
                  */
                 swipeHandler.attach();
 
