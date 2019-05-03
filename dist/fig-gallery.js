@@ -38,7 +38,7 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.4.1
+ * @version 1.7.0
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -72,15 +72,13 @@ function FigureGallery(_ref) {
       _ref$throwsOpenIndexE = _ref.throwsOpenIndexError,
       throwsOpenIndexError = _ref$throwsOpenIndexE === void 0 ? false : _ref$throwsOpenIndexE,
       _ref$resizePolicy = _ref.resizePolicy,
-      resizePolicy = _ref$resizePolicy === void 0 ? 'CONTENT' : _ref$resizePolicy,
+      resizePolicy = _ref$resizePolicy === void 0 ? RESIZE_POLICY.CONTENT : _ref$resizePolicy,
       _ref$buttonPlacementP = _ref.buttonPlacementPolicy,
-      buttonPlacementPolicy = _ref$buttonPlacementP === void 0 ? 'ALL' : _ref$buttonPlacementP,
+      buttonPlacementPolicy = _ref$buttonPlacementP === void 0 ? BUTTON_PLACEMENT_POLICY.ALL : _ref$buttonPlacementP,
       _ref$buttonContainerP = _ref.buttonContainerPlacementPolicy,
-      buttonContainerPlacementPolicy = _ref$buttonContainerP === void 0 ? 'OUTSIDE_CONTENT' : _ref$buttonContainerP;
-  var BUTTON_PLACEMENT_POLICY = ['ALL', 'NAVIGATORS_ONLY', 'CLOSE_ONLY'];
-  var RESIZE_POLICY = ['CONTENT', 'CONTAINER'];
-  var BUTTON_CONTAINER_PLACEMENT_POLICY = ['OUTSIDE_CONTENT', 'INSIDE_CONTENT']; // Type-checks
+      buttonContainerPlacementPolicy = _ref$buttonContainerP === void 0 ? BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT : _ref$buttonContainerP;
 
+  // Type-checks
   if (typeof container === 'string') {
     container = document.querySelector(container);
   }
@@ -89,17 +87,17 @@ function FigureGallery(_ref) {
     throw new Error('The gallery container must be a valid DOM element.');
   }
 
-  if (buttonContainerSelector !== null) {
-    if (BUTTON_PLACEMENT_POLICY.indexOf(buttonPlacementPolicy) <= -1) {
+  if (buttonContainerSelector != null) {
+    if (!BUTTON_PLACEMENT_POLICY[buttonPlacementPolicy]) {
       throw new Error('The specified button placement policy is not defined.');
     }
 
-    if (BUTTON_CONTAINER_PLACEMENT_POLICY.indexOf(buttonContainerPlacementPolicy) <= -1) {
+    if (!BUTTON_CONTAINER_PLACEMENT_POLICY[buttonContainerPlacementPolicy]) {
       throw new Error('The specified button container placement policy is not defined.');
     }
   }
 
-  if (RESIZE_POLICY.indexOf(resizePolicy) <= -1) {
+  if (!RESIZE_POLICY[resizePolicy]) {
     throw new Error('The specified resize policy is not defined.');
   }
 
@@ -157,7 +155,7 @@ function FigureGallery(_ref) {
 
   var currentClass = currentSelector.substr(1);
   /**
-   * Object containining the CSS classes that get applied to the buttons of the overlay.
+   * Object containing the CSS classes that get applied to the buttons of the overlay.
    *
    * @constant
    * @enum {string}
@@ -171,7 +169,7 @@ function FigureGallery(_ref) {
     next: buttonSelectors.next.substr(1)
   };
   /**
-   * Object containining the CSS classes that get applied to the overlay.
+   * Object containing the CSS classes that get applied to the overlay.
    *
    * @constant
    * @enum {string}
@@ -190,7 +188,7 @@ function FigureGallery(_ref) {
   /**
    * Gets all the <figure> elements children of container.
    *
-   * @type {HTMLElement[]}
+   * @type {NodeList}
    *
    * @private
    */
@@ -202,14 +200,20 @@ function FigureGallery(_ref) {
   *
   * @type {HTMLDialogElement|HTMLDivElement}
   *
+  * @property {object} buttons - Contains the buttons contained in the overlay.
+  * @property {HTMLElement} content - Contains the content container.
+  * @method content.getContent() - Gets the content of overlay.content.
+  *
   * @private
   */
 
   var overlay = function () {
     /**
-     * Refers to the .`overlay` element.
+     * Refers to the `.overlay` element.
      *
-     * @type {HTMLDialogElement|HTMLDivElement|null}
+     * @type {HTMLElement|null}
+     *
+     * @property {HTMLElement} content - Contains the content container.
      *
      * @rivate
      *
@@ -218,7 +222,7 @@ function FigureGallery(_ref) {
     var dialog = container.querySelector(overlaySelectors.overlay);
 
     var buttonContainer = function () {
-      if (buttonContainerSelector === null) {
+      if (buttonContainerSelector == null) {
         return null;
       }
 
@@ -236,9 +240,9 @@ function FigureGallery(_ref) {
           throw new Error('buttonContainerSelector must be a class or an ID. Complex selector given.');
         }
 
-        if (buttonContainerPlacementPolicy.toUpperCase() === 'OUTSIDE_CONTENT') {
+        if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT) {
           dialog.appendChild(tmp);
-        } else if (buttonContainerPlacementPolicy.toUpperCase() === 'INSIDE_CONTENT') {
+        } else if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.INSIDE_CONTENT) {
           dialog.content.appendChild(tmp);
         }
       }
@@ -264,7 +268,7 @@ function FigureGallery(_ref) {
       container.appendChild(dialog);
     }
     /**
-     * Object containining the buttons in the overlay.
+     * Object containing the buttons in the overlay.
      *
      * @enum {HTMLButtonElement}
      *
@@ -285,16 +289,16 @@ function FigureGallery(_ref) {
         if (buttonContainer === null) {
           dialog.appendChild(button);
         } else {
-          if (buttonPlacementPolicy.toUpperCase() === 'ALL') {
+          if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.ALL) {
             buttonContainer.appendChild(button);
           } else {
-            if (buttonPlacementPolicy.toUpperCase() === 'NAVIGATORS_ONLY') {
+            if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.NAVIGATORS_ONLY) {
               if (type !== 'close') {
                 buttonContainer.appendChild(button);
               } else {
                 dialog.appendChild(button);
               }
-            } else if (buttonPlacementPolicy.toUpperCase() === 'CLOSE_ONLY') {
+            } else if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.CLOSE_ONLY) {
               if (type === 'close') {
                 buttonContainer.appendChild(button);
               } else {
@@ -374,12 +378,11 @@ function FigureGallery(_ref) {
 
   var swipeHandler = function () {
     if (swipe && typeof SwipeEvent === 'function') {
-      var swipeEvent = new SwipeEvent({
+      return new SwipeEvent({
         element: container,
         itemSelector: 'figure',
         activeSelector: currentSelector
       });
-      return swipeEvent;
     }
 
     return null;
@@ -394,7 +397,7 @@ function FigureGallery(_ref) {
 
 
   var eventCallbacks = {
-    containerClick: function containerClick(e) {
+    containerClick: function containerClick() {
       if (!that.isOpen()) {
         that.open(null);
       }
@@ -491,10 +494,10 @@ function FigureGallery(_ref) {
       var overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
       var ratio = Math.min(1, (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / image.naturalWidth, (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / image.naturalHeight);
 
-      if (resizePolicy.toUpperCase() === 'CONTENT') {
+      if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTENT) {
         image.style.width = image.naturalWidth * ratio + 'px';
         image.style.height = image.naturalHeight * ratio + 'px';
-      } else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+      } else if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
         overlay.content.style.width = image.naturalWidth * ratio + 'px';
         overlay.content.style.height = image.naturalHeight * ratio + 'px';
       }
@@ -514,10 +517,10 @@ function FigureGallery(_ref) {
       var overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
       var ratio = Math.min(1, (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / video.videoWidth, (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / video.videoHeight);
 
-      if (resizePolicy.toUpperCase() === 'CONTENT') {
+      if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTENT) {
         video.style.width = video.videoWidth * ratio + 'px';
         video.style.height = video.videoHeight * ratio + 'px';
-      } else if (resizePolicy.toUpperCase() === 'CONTAINER') {
+      } else if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
         overlay.content.style.width = video.videoWidth * ratio + 'px';
         overlay.content.style.height = video.videoHeight * ratio + 'px';
       }
@@ -545,7 +548,7 @@ function FigureGallery(_ref) {
       embed.height = parseInt(embed.getAttribute('data-height'));
       var ratio = Math.min((overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / embed.width, (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / embed.height);
 
-      if (resizePolicy.toUpperCase() === 'CONTAINER') {
+      if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
         overlay.content.style.width = embed.width * ratio + 'px';
         overlay.content.style.height = embed.height * ratio + 'px';
       }
@@ -605,7 +608,7 @@ function FigureGallery(_ref) {
   /**
    * Sets the given figure as current.
    *
-   * @param {HTMLElement} figure
+   * @param {HTMLElement|Node} figure
    *
    * @private
    */
@@ -710,8 +713,8 @@ function FigureGallery(_ref) {
 
       if (swipeHandler) {
         /**
-         * @listens swipe-event#swipe
-         * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+         * @listens SwipeEvent#swipe
+         * @see {@link https://github.com/dencreativityspace/swipe-event|SwipeEvent}
          */
         swipeHandler.attach();
         document.addEventListener('swipe', eventCallbacks.swipeNavigation);
@@ -762,7 +765,7 @@ function FigureGallery(_ref) {
 
   var mutation = function () {
     if ('MutationObserver' in window) {
-      var m = new MutationObserver(function (mutations, observer) {
+      var m = new MutationObserver(function (mutations) {
         mutations.forEach(function (mut) {
           if (mut.type === 'childList') {
             figures = container.querySelectorAll('figure');
@@ -796,7 +799,7 @@ function FigureGallery(_ref) {
    * @param   {?number}   [index=0]   Index of the element to be shown.
    *                                  If is null gets the current figure.
    *
-   * @emits FigureGallery#opened
+   * @emits FigureGallery#fig-gallery:opened
    *
    * @return  {this}
    *
@@ -835,17 +838,28 @@ function FigureGallery(_ref) {
     var openedEvent = null;
 
     if (typeof window.CustomEvent !== 'function') {
-      openedEvent = document.createEvent('opened');
-      openedEvent.initCustomEvent('opened', false, false, {
-        current: current
+      openedEvent = document.createEvent('fig-gallery:opened');
+      openedEvent.initCustomEvent('fig-gallery:opened', false, false, {
+        current: current,
+        active: that.getActiveFigure()
       });
     } else {
-      openedEvent = new CustomEvent('opened', {
+      openedEvent = new CustomEvent('fig-gallery:opened', {
         detail: {
-          current: current
+          current: current,
+          active: that.getActiveFigure()
         }
       });
     }
+    /**
+     * Event triggered when the gallery gets opened.
+     *
+     * @event FigureGallery#fig-gallery:opened
+     * @type {object}
+     * @property {HTMLElement} current - Current active <figure> element in container.
+     * @property {HTMLElement} active - Active <figure> element in overlay.
+     */
+
 
     container.dispatchEvent(openedEvent);
     return _this;
@@ -855,7 +869,7 @@ function FigureGallery(_ref) {
    *
    * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
    *
-   * @emits FigureGallery#prev
+   * @emits FigureGallery#fig-gallery:prev
    *
    * @return  {this}
   */
@@ -868,19 +882,31 @@ function FigureGallery(_ref) {
     var prevEvent = null;
 
     if (typeof window.CustomEvent !== 'function') {
-      prevEvent = document.createEvent('prev');
-      prevEvent.initCustomEvent('prev', false, false, {
+      prevEvent = document.createEvent('fig-gallery:prev');
+      prevEvent.initCustomEvent('fig-gallery:prev', false, false, {
         current: current,
-        next: oldCurrent
+        next: oldCurrent,
+        active: that.getActiveFigure()
       });
     } else {
-      prevEvent = new CustomEvent('prev', {
+      prevEvent = new CustomEvent('fig-gallery:prev', {
         detail: {
           current: current,
-          next: oldCurrent
+          next: oldCurrent,
+          active: that.getActiveFigure()
         }
       });
     }
+    /**
+     * Event triggered when the gallery gets navigated to the previous element.
+     *
+     * @event FigureGallery#fig-gallery:prev
+     * @type {object}
+     * @property {HTMLElement} current - Current active <figure> element in container.
+     * @property {HTMLElement} next - Old active <figure> element in container which succeeds the current.
+     * @property {HTMLElement} active - Active <figure> element in overlay.
+     */
+
 
     container.dispatchEvent(prevEvent);
     return _this;
@@ -890,7 +916,7 @@ function FigureGallery(_ref) {
    *
    * @param   {boolean}   [cycleState]   Determines if the counter must cycle.
    *
-   * @emits FigureGallery#next
+   * @emits FigureGallery#fig-gallery:next
    *
    * @return  {this}
   */
@@ -903,19 +929,31 @@ function FigureGallery(_ref) {
     var nextEvent = null;
 
     if (typeof window.CustomEvent !== 'function') {
-      nextEvent = document.createEvent('next');
-      nextEvent.initCustomEvent('next', false, false, {
+      nextEvent = document.createEvent('fig-gallery:next');
+      nextEvent.initCustomEvent('fig-gallery:next', false, false, {
         current: current,
-        prev: oldCurrent
+        prev: oldCurrent,
+        active: that.getActiveFigure()
       });
     } else {
-      nextEvent = new CustomEvent('next', {
+      nextEvent = new CustomEvent('fig-gallery:next', {
         detail: {
           current: current,
-          prev: oldCurrent
+          prev: oldCurrent,
+          active: that.getActiveFigure()
         }
       });
     }
+    /**
+     * Event triggered when the gallery gets navigated to the next element.
+     *
+     * @event FigureGallery#fig-gallery:next
+     * @type {object}
+     * @property {HTMLElement} current - Current active <figure> element in container.
+     * @property {HTMLElement} prev - Old active <figure> element in container which precedes the current.
+     * @property {HTMLElement} active - Active <figure> element in overlay.
+     */
+
 
     container.dispatchEvent(nextEvent);
     return _this;
@@ -923,11 +961,11 @@ function FigureGallery(_ref) {
   /**
    * Sets the current `<figure>`.
    *
-   * @param   {number|HTMLElement}   figure   Index of the element or the
+   * @param   {number|HTMLElement|Node}   figure   Index of the element or the
    *                                          element itself to bet setted as
    *                                          current.
    *
-   * @emits FigureGallery#setted
+   * @emits FigureGallery#fig-gallery:setted
    *
    * @return  {this}
    *
@@ -967,19 +1005,31 @@ function FigureGallery(_ref) {
     var settedEvent = null;
 
     if (typeof window.CustomEvent !== 'function') {
-      settedEvent = document.createEvent('setted');
-      settedEvent.initCustomEvent('setted', false, false, {
+      settedEvent = document.createEvent('fig-gallery:setted');
+      settedEvent.initCustomEvent('fig-gallery:setted', false, false, {
         current: current,
-        old: oldCurrent
+        old: oldCurrent,
+        active: that.getActiveFigure()
       });
     } else {
-      settedEvent = new CustomEvent('setted', {
+      settedEvent = new CustomEvent('fig-gallery:setted', {
         detail: {
           current: current,
-          old: oldCurrent
+          old: oldCurrent,
+          active: that.getActiveFigure()
         }
       });
     }
+    /**
+     * Event triggered when the gallery gets setted on a specific element.
+     *
+     * @event FigureGallery#fig-gallery:setted
+     * @type {object}
+     * @property {HTMLElement} current - Current active <figure> element in container.
+     * @property {HTMLElement} old - Old active <figure> element in container.
+     * @property {HTMLElement} active - Active <figure> element in overlay.
+     */
+
 
     container.dispatchEvent(settedEvent);
     return _this;
@@ -987,7 +1037,7 @@ function FigureGallery(_ref) {
   /**
    * Closes the overlay.
    *
-   * @emits FigureGallery#closed
+   * @emits FigureGallery#fig-gallery:closed
    *
    * @return  {this}
   */
@@ -1007,17 +1057,27 @@ function FigureGallery(_ref) {
     var closedEvent = null;
 
     if (typeof window.CustomEvent !== 'function') {
-      closedEvent = document.createEvent('closed');
-      closedEvent.initCustomEvent('closed', false, false, {
-        current: current
+      closedEvent = document.createEvent('fig-gallery:closed');
+      closedEvent.initCustomEvent('fig-gallery:closed', false, false, {
+        current: current,
+        active: that.getActiveFigure()
       });
     } else {
-      closedEvent = new CustomEvent('closed', {
+      closedEvent = new CustomEvent('fig-gallery:closed', {
         detail: {
-          current: current
+          current: current,
+          active: that.getActiveFigure()
         }
       });
     }
+    /**
+     * Event triggered when the gallery gets closed.
+     *
+     * @event FigureGallery#fig-gallery:closed
+     * @type {object}
+     * @property {HTMLElement} current - Current active <figure> element in container.
+     */
+
 
     container.dispatchEvent(closedEvent);
     return _this;
@@ -1027,7 +1087,7 @@ function FigureGallery(_ref) {
    *
    * @param   {boolean}   val
    *
-   * @emits FigureGallery#openablechange
+   * @emits FigureGallery#fig-gallery:openablechange
    *
    * @return  {this}
    *
@@ -1057,17 +1117,25 @@ function FigureGallery(_ref) {
       var openablechangeEvent = null;
 
       if (typeof window.CustomEvent !== 'function') {
-        openablechangeEvent = document.createEvent('openablechange');
-        openablechangeEvent.initCustomEvent('openablechange', false, false, {
+        openablechangeEvent = document.createEvent('fig-gallery:openablechange');
+        openablechangeEvent.initCustomEvent('fig-gallery:openablechange', false, false, {
           openable: val
         });
       } else {
-        openablechangeEvent = new CustomEvent('openablechange', {
+        openablechangeEvent = new CustomEvent('fig-gallery:openablechange', {
           detail: {
             openable: val
           }
         });
       }
+      /**
+       * Event triggered when the gallery gets updated if openable or not.
+       *
+       * @event FigureGallery#fig-gallery:openablechange
+       * @type {object}
+       * @property {boolean} openable - Gets the current openable state.
+       */
+
 
       container.dispatchEvent(openablechangeEvent);
     }
@@ -1087,7 +1155,7 @@ function FigureGallery(_ref) {
 
   this.updateFigures = function () {
     var events = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-    figures = container.querySelctorAll('figure');
+    figures = container.querySelectorAll('figure');
 
     if (!!events) {
       figures.forEach(function (figure) {
@@ -1172,3 +1240,20 @@ function FigureGallery(_ref) {
     return swipeHandler;
   };
 }
+
+var BUTTON_CONTAINER_PLACEMENT_POLICY = {
+  OUTSIDE_CONTENT: 'OUTSIDE_CONTENT',
+  INSIDE_CONTENT: 'INSIDE_CONTENT'
+};
+Object.freeze(BUTTON_CONTAINER_PLACEMENT_POLICY);
+var BUTTON_PLACEMENT_POLICY = {
+  ALL: 'ALL',
+  NAVIGATORS_ONLY: 'NAVIGATORS_ONLY',
+  CLOSE_ONLY: 'CLOSE_ONLY'
+};
+Object.freeze(BUTTON_PLACEMENT_POLICY);
+var RESIZE_POLICY = {
+  CONTENT: 'CONTENT',
+  CONTAINER: 'CONTAINER'
+};
+Object.freeze(RESIZE_POLICY);

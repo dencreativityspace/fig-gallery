@@ -80,6 +80,7 @@ Gallery that permits to see images or videos at the maximum of their sizesor, a
 | [param.overlaySelectors.overlay] | <code>string</code> | <code>&quot;&#x27;.overlay&#x27;&quot;</code> | Selector for the overlay element. |
 | [param.overlaySelectors.content] | <code>string</code> | <code>&quot;&#x27;.overlay-content&#x27;&quot;</code> | Selector content of the overlay element. |
 | [param.cycle] | <code>boolean</code> | <code>true</code> | Determines if the gallery can cycle when reaches the end-points. |
+| [param.swipe] | <code>boolean</code> | <code>false</code> | Determines if the gallery can be navigated with swipes. |
 | [param.openable] | <code>boolean</code> | <code>true</code> | Determines if the gallery can be opened or not. If openable, shows the overlay. |
 | [param.throwsOpenIndexError] | <code>boolean</code> | <code>false</code> | Determines if the gallery has to throw an error when the users tries to navigate beyond the elements. |
 | [resizePolicy] | <code>string</code> | <code>&quot;&#x27;CONTENT&#x27;&quot;</code> | Determines which element must be resized. Can be `'CONTAINER'` or `'CONTENT'`. |
