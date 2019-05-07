@@ -2,7 +2,7 @@
 
 ## FigureGallery
 **Kind**: global class  
-**Version**: 1.4.1  
+**Version**: 1.7.0  
 **Author:** Gennaro Landolfi <gennarolandolfi@codedwork.it>  
 
 * [FigureGallery](#FigureGallery)
@@ -22,11 +22,16 @@
         * [.getActiveFigure()](#FigureGallery+getActiveFigure) ⇒ <code>HTMLElement</code>
         * [.getActiveContent()](#FigureGallery+getActiveContent) ⇒ <code>HTMLElement</code>
         * [.getSwipeHandler()](#FigureGallery+getSwipeHandler) ⇒ <code>SwipeEvent</code> &#124; <code>null</code>
+        * ["fig-gallery:opened"](#FigureGallery+event_fig-gallery_opened)
+        * ["fig-gallery:prev"](#FigureGallery+event_fig-gallery_prev)
+        * ["fig-gallery:next"](#FigureGallery+event_fig-gallery_next)
+        * ["fig-gallery:setted"](#FigureGallery+event_fig-gallery_setted)
+        * ["fig-gallery:closed"](#FigureGallery+event_fig-gallery_closed)
+        * ["fig-gallery:openablechange"](#FigureGallery+event_fig-gallery_openablechange)
     * _inner_
         * [~buttonClasses](#FigureGallery..buttonClasses) : <code>enum</code> ℗
         * [~overlayClasses](#FigureGallery..overlayClasses) : <code>enum</code> ℗
-        * [~figures](#FigureGallery..figures) : <code>Array.&lt;HTMLElement&gt;</code> ℗
-        * [~overlay](#FigureGallery..overlay) : <code>HTMLDialogElement</code> &#124; <code>HTMLDivElement</code> ℗
+        * [~figures](#FigureGallery..figures) : <code>NodeList</code> ℗
         * [~current](#FigureGallery..current) : <code>HTMLElement</code> ℗
         * [~swipeHandler](#FigureGallery..swipeHandler) : <code>SwipeEvent</code> &#124; <code>null</code> ℗
         * [~eventCallbacks](#FigureGallery..eventCallbacks) : <code>object</code> ℗
@@ -97,7 +102,7 @@ Opens the overlay to show the `<figure>` with the given index or the current one
 
 - Will throw an error if `throwsOpenIndexError` is set to `true`and the given index is out of bound.
 
-**Emits**: <code>FigureGallery#event:opened</code>  
+**Emits**: <code>[fig-gallery:opened](#FigureGallery+event_fig-gallery_opened)</code>  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -109,7 +114,7 @@ Opens the overlay to show the `<figure>` with the given index or the current one
 Shows the previous `<figure>`. If the ovelay is closed, opens it.
 
 **Kind**: instance method of <code>[FigureGallery](#FigureGallery)</code>  
-**Emits**: <code>FigureGallery#event:prev</code>  
+**Emits**: <code>[fig-gallery:prev](#FigureGallery+event_fig-gallery_prev)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -121,7 +126,7 @@ Shows the previous `<figure>`. If the ovelay is closed, opens it.
 Shows the next `<figure>`. If the ovelay is closed, opens it.
 
 **Kind**: instance method of <code>[FigureGallery](#FigureGallery)</code>  
-**Emits**: <code>FigureGallery#event:next</code>  
+**Emits**: <code>[fig-gallery:next](#FigureGallery+event_fig-gallery_next)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -140,11 +145,11 @@ Sets the current `<figure>`.
 - Will throw an error if `throwsOpenIndexError` is set to true and if the user tries to go beyond the end-points.
 - Will throw an error if the argument isn't a valid element.
 
-**Emits**: <code>FigureGallery#event:setted</code>  
+**Emits**: <code>[fig-gallery:setted](#FigureGallery+event_fig-gallery_setted)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| figure | <code>number</code> &#124; <code>HTMLElement</code> | Index of the element or the                                          element itself to bet setted as                                          current. |
+| figure | <code>number</code> &#124; <code>HTMLElement</code> &#124; <code>Node</code> | Index of the element or the                                          element itself to bet setted as                                          current. |
 
 <a name="FigureGallery+close"></a>
 
@@ -152,7 +157,7 @@ Sets the current `<figure>`.
 Closes the overlay.
 
 **Kind**: instance method of <code>[FigureGallery](#FigureGallery)</code>  
-**Emits**: <code>FigureGallery#event:closed</code>  
+**Emits**: <code>[fig-gallery:closed](#FigureGallery+event_fig-gallery_closed)</code>  
 <a name="FigureGallery+setOpenable"></a>
 
 ### figureGallery.setOpenable(val) ⇒ <code>this</code>
@@ -163,7 +168,7 @@ Sets the gallery to be openable or not.
 
 - Will throw an error if the argument is null or isn't a boolean.
 
-**Emits**: <code>FigureGallery#event:openablechange</code>  
+**Emits**: <code>[fig-gallery:openablechange](#FigureGallery+event_fig-gallery_openablechange)</code>  
 
 | Param | Type |
 | --- | --- |
@@ -222,10 +227,89 @@ Returns the content of the current figure element in the overlay.
 Returns the swipe handler instance, if exists.
 
 **Kind**: instance method of <code>[FigureGallery](#FigureGallery)</code>  
+<a name="FigureGallery+event_fig-gallery_opened"></a>
+
+### "fig-gallery:opened"
+Event triggered when the gallery gets opened.
+
+**Kind**: event emitted by <code>[FigureGallery](#FigureGallery)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| current | <code>HTMLElement</code> | Current active <figure> element in container. |
+| active | <code>HTMLElement</code> | Active <figure> element in overlay. |
+
+<a name="FigureGallery+event_fig-gallery_prev"></a>
+
+### "fig-gallery:prev"
+Event triggered when the gallery gets navigated to the previous element.
+
+**Kind**: event emitted by <code>[FigureGallery](#FigureGallery)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| current | <code>HTMLElement</code> | Current active <figure> element in container. |
+| next | <code>HTMLElement</code> | Old active <figure> element in container which succeeds the current. |
+| active | <code>HTMLElement</code> | Active <figure> element in overlay. |
+
+<a name="FigureGallery+event_fig-gallery_next"></a>
+
+### "fig-gallery:next"
+Event triggered when the gallery gets navigated to the next element.
+
+**Kind**: event emitted by <code>[FigureGallery](#FigureGallery)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| current | <code>HTMLElement</code> | Current active <figure> element in container. |
+| prev | <code>HTMLElement</code> | Old active <figure> element in container which precedes the current. |
+| active | <code>HTMLElement</code> | Active <figure> element in overlay. |
+
+<a name="FigureGallery+event_fig-gallery_setted"></a>
+
+### "fig-gallery:setted"
+Event triggered when the gallery gets setted on a specific element.
+
+**Kind**: event emitted by <code>[FigureGallery](#FigureGallery)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| current | <code>HTMLElement</code> | Current active <figure> element in container. |
+| old | <code>HTMLElement</code> | Old active <figure> element in container. |
+| active | <code>HTMLElement</code> | Active <figure> element in overlay. |
+
+<a name="FigureGallery+event_fig-gallery_closed"></a>
+
+### "fig-gallery:closed"
+Event triggered when the gallery gets closed.
+
+**Kind**: event emitted by <code>[FigureGallery](#FigureGallery)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| current | <code>HTMLElement</code> | Current active <figure> element in container. |
+
+<a name="FigureGallery+event_fig-gallery_openablechange"></a>
+
+### "fig-gallery:openablechange"
+Event triggered when the gallery gets updated if openable or not.
+
+**Kind**: event emitted by <code>[FigureGallery](#FigureGallery)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| openable | <code>boolean</code> | Gets the current openable state. |
+
 <a name="FigureGallery..buttonClasses"></a>
 
 ### FigureGallery~buttonClasses : <code>enum</code> ℗
-Object containining the CSS classes that get applied to the buttons of the overlay.
+Object containing the CSS classes that get applied to the buttons of the overlay.
 
 **Kind**: inner enum property of <code>[FigureGallery](#FigureGallery)</code>  
 **Access:** private  
@@ -240,7 +324,7 @@ Object containining the CSS classes that get applied to the buttons of the overl
 <a name="FigureGallery..overlayClasses"></a>
 
 ### FigureGallery~overlayClasses : <code>enum</code> ℗
-Object containining the CSS classes that get applied to the overlay.
+Object containing the CSS classes that get applied to the overlay.
 
 **Kind**: inner enum property of <code>[FigureGallery](#FigureGallery)</code>  
 **Access:** private  
@@ -253,15 +337,8 @@ Object containining the CSS classes that get applied to the overlay.
 
 <a name="FigureGallery..figures"></a>
 
-### FigureGallery~figures : <code>Array.&lt;HTMLElement&gt;</code> ℗
+### FigureGallery~figures : <code>NodeList</code> ℗
 Gets all the <figure> elements children of container.
-
-**Kind**: inner property of <code>[FigureGallery](#FigureGallery)</code>  
-**Access:** private  
-<a name="FigureGallery..overlay"></a>
-
-### FigureGallery~overlay : <code>HTMLDialogElement</code> &#124; <code>HTMLDivElement</code> ℗
-Represents the overlay element.
 
 **Kind**: inner property of <code>[FigureGallery](#FigureGallery)</code>  
 **Access:** private  
@@ -399,7 +476,7 @@ Sets the given figure as current.
 
 | Param | Type |
 | --- | --- |
-| figure | <code>HTMLElement</code> | 
+| figure | <code>HTMLElement</code> &#124; <code>Node</code> | 
 
 <a name="FigureGallery..updateOverlayFigure"></a>
 
