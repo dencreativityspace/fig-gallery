@@ -2,7 +2,7 @@
 
 ## FigureGallery
 **Kind**: global class  
-**Version**: 1.7.0  
+**Version**: 1.7.2  
 **Author:** Gennaro Landolfi <gennarolandolfi@codedwork.it>  
 
 * [FigureGallery](#FigureGallery)
@@ -497,6 +497,8 @@ Lets the user navigate through the gallery.
 
 - setCurrentFigure
 - updateOverlayFigure
+- getFigureIndex
+- KeepInBound
 
 
 | Param | Type | Default | Description |

@@ -3,6 +3,7 @@
 /**
  * Gallery that permits to see images or videos at the maximum of their sizes
  * or, at least the maximum that fits in the window respecting ratio.
+ * Removes the controls and caches the overlay.
  *
  * @constructor
  *
@@ -38,7 +39,7 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.7.1
+ * @version 1.7.3
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -196,6 +197,15 @@ function FigureGallery(_ref) {
 
   var figures = container.querySelectorAll('figure');
   /**
+   * Caches the overlay when removed.
+   *
+   * @type {HTMLDialogElement|HTMLDivElement|null}
+   *
+   * @private
+   */
+
+  var dialogCache = null;
+  /**
   * Represents the overlay element.
   *
   * @type {HTMLDialogElement|HTMLDivElement}
@@ -205,127 +215,11 @@ function FigureGallery(_ref) {
   * @method content.getContent() - Gets the content of overlay.content.
   *
   * @private
+  *
+  * @see createOverlay
   */
 
-  var overlay = function () {
-    /**
-     * Refers to the `.overlay` element.
-     *
-     * @type {HTMLElement|null}
-     *
-     * @property {HTMLElement} content - Contains the content container.
-     *
-     * @rivate
-     *
-     * @throws Throws an error when the `buttonContainerSelector` is too complex.
-     */
-    var dialog = container.querySelector(overlaySelectors.overlay);
-
-    var buttonContainer = function () {
-      if (buttonContainerSelector == null) {
-        return null;
-      }
-
-      var tmp = dialog.querySelector(buttonContainerSelector);
-
-      if (!tmp) {
-        var selector = buttonContainerSelector.substr(1);
-        tmp = document.createElement('div');
-
-        if (buttonContainerSelector.charAt(0) === '#') {
-          tmp.id = selector;
-        } else if (buttonContainerSelector.charAt(0) === '.') {
-          tmp.classList.add(selector);
-        } else {
-          throw new Error('buttonContainerSelector must be a class or an ID. Complex selector given.');
-        }
-
-        if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT) {
-          dialog.appendChild(tmp);
-        } else if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.INSIDE_CONTENT) {
-          dialog.content.appendChild(tmp);
-        }
-      }
-
-      return tmp;
-    }();
-
-    if (!dialog) {
-      // Initalizes overlay
-      dialog = document.createElement('HTMLDialogElement' in window ? 'dialog' : 'div');
-      dialog.classList.add(overlayClasses.overlay);
-      /**
-       * Refers to the .`overlay-content` element.
-       *
-       * @type {HTMLDivElement}
-       *
-       * @public
-       */
-
-      dialog.content = document.createElement('div');
-      dialog.content.classList.add(overlayClasses.content);
-      dialog.appendChild(dialog.content);
-      container.appendChild(dialog);
-    }
-    /**
-     * Object containing the buttons in the overlay.
-     *
-     * @enum {HTMLButtonElement}
-     *
-     * @public
-     */
-
-
-    dialog.buttons = {};
-
-    for (var type in buttonsOrder) {
-      var button = dialog.querySelector(buttonSelectors[type]);
-
-      if (!button) {
-        button = document.createElement('button');
-        button.classList.add(buttonClasses[type]);
-        button.innerHTML = buttonContents[type];
-
-        if (buttonContainer === null) {
-          dialog.appendChild(button);
-        } else {
-          if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.ALL) {
-            buttonContainer.appendChild(button);
-          } else {
-            if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.NAVIGATORS_ONLY) {
-              if (type !== 'close') {
-                buttonContainer.appendChild(button);
-              } else {
-                dialog.appendChild(button);
-              }
-            } else if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.CLOSE_ONLY) {
-              if (type === 'close') {
-                buttonContainer.appendChild(button);
-              } else {
-                dialog.appendChild(button);
-              }
-            }
-          }
-        }
-      }
-
-      dialog.buttons[type] = button;
-    }
-    /**
-     * Utility function to get the content of the current figure.
-     *
-     * @function
-     *
-     * @return {HTMLImageElement|HTMLVideoElement|HTMLObjectElement|HTMLEmbedElement|HTMLIFrameElement|null}
-     */
-
-
-    dialog.getContent = function () {
-      return dialog.content.querySelector('img, video, object, embed, iframe');
-    };
-
-    return dialog;
-  }();
+  var overlay = createOverlay();
   /**
   * Represents the current element in container.
   *
@@ -333,7 +227,6 @@ function FigureGallery(_ref) {
   *
   * @private
   */
-
 
   var current = function () {
     var _iteratorNormalCompletion = true;
@@ -462,7 +355,8 @@ function FigureGallery(_ref) {
     },
     resize: function resize() {
       setContentSize();
-    }
+    },
+    buttons: createButtonsCallbacks()
   }; // Private methods
 
   /**
@@ -592,6 +486,138 @@ function FigureGallery(_ref) {
     }
   }
   /**
+   * Creates the overlay object or retrieves it from cache.
+   * May return null if `openable` is `false`.
+   *
+   * @return {HTMLDialogElement|HTMLDivElement|null}
+   *
+   * @see dialogCache
+   * @see overlay
+   *
+   * @private
+   *
+   * @throws Throws an error when the `buttonContainerSelector` is too complex.
+   */
+
+
+  function createOverlay() {
+    if (openable) {
+      if (dialogCache) {
+        container.appendChild(dialogCache);
+        return dialogCache;
+      } // Takes interval if already exists
+
+
+      var dialog = container.querySelector(overlaySelectors.overlay);
+
+      if (!dialog) {
+        // Initalizes overlay
+        dialog = document.createElement('HTMLDialogElement' in window ? 'dialog' : 'div');
+        dialog.classList.add(overlayClasses.overlay);
+        dialog.content = document.createElement('div');
+        dialog.content.classList.add(overlayClasses.content);
+        dialog.appendChild(dialog.content);
+      } // Takes buttons or creates them.
+
+
+      dialog.buttons = {};
+
+      var buttonContainer = function () {
+        if (buttonContainerSelector == null) {
+          return null;
+        }
+
+        var tmp = dialog.querySelector(buttonContainerSelector);
+
+        if (!tmp) {
+          var selector = buttonContainerSelector.substr(1);
+          tmp = document.createElement('div');
+
+          if (buttonContainerSelector.charAt(0) === '#') {
+            tmp.id = selector;
+          } else if (buttonContainerSelector.charAt(0) === '.') {
+            tmp.classList.add(selector);
+          } else {
+            throw new Error('buttonContainerSelector must be a class or an ID. Complex selector given.');
+          }
+
+          if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT) {
+            dialog.appendChild(tmp);
+          } else if (buttonContainerPlacementPolicy.toUpperCase() === BUTTON_CONTAINER_PLACEMENT_POLICY.INSIDE_CONTENT) {
+            dialog.content.appendChild(tmp);
+          }
+        }
+
+        return tmp;
+      }();
+
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = buttonsOrder[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var type = _step2.value;
+          var button = dialog.querySelector(buttonSelectors[type]);
+
+          if (!button) {
+            button = document.createElement('button');
+            button.classList.add(buttonClasses[type]);
+            button.innerHTML = buttonContents[type];
+
+            if (buttonContainer === null) {
+              dialog.appendChild(button);
+            } else {
+              if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.ALL) {
+                buttonContainer.appendChild(button);
+              } else {
+                if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.NAVIGATORS_ONLY) {
+                  if (type !== 'close') {
+                    buttonContainer.appendChild(button);
+                  } else {
+                    dialog.appendChild(button);
+                  }
+                } else if (buttonPlacementPolicy.toUpperCase() === BUTTON_PLACEMENT_POLICY.CLOSE_ONLY) {
+                  if (type === 'close') {
+                    buttonContainer.appendChild(button);
+                  } else {
+                    dialog.appendChild(button);
+                  }
+                }
+              }
+            }
+          }
+
+          dialog.buttons[type] = button;
+        } // Utility to get the content of the current figure.
+
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      dialog.getContent = function () {
+        return dialog.content.querySelector('img, video, object, embed, iframe');
+      };
+
+      dialogCache = dialog;
+      container.appendChild(dialogCache);
+      return dialogCache;
+    }
+
+    return null;
+  }
+  /**
    * Gets the index of the given figure.
    *
    * @param {HTMLElement} figure
@@ -668,6 +694,8 @@ function FigureGallery(_ref) {
    *
    * @see setCurrentFigure
    * @see updateOverlayFigure
+   * @see getFigureIndex
+   * @see KeepInBound
    *
    * @private
    */
@@ -683,12 +711,55 @@ function FigureGallery(_ref) {
     }
   }
   /**
+   * Creates the object that will containt the button callbacks.
+   * Returns `null` if `overlay` doesn't exists.
+   * Useful for caching.
+   *
+   * @return {object|null}
+   *
+   * @see overlay
+   *
+   * @private
+   */
+
+
+  function createButtonsCallbacks() {
+    if (overlay) {
+      var callbacks = {};
+
+      var _arr = Object.keys(overlay.buttons);
+
+      var _loop = function _loop() {
+        var type = _arr[_i];
+
+        callbacks[type] = function (e) {
+          e.stopImmediatePropagation();
+          that[type]();
+        };
+      };
+
+      for (var _i = 0; _i < _arr.length; _i++) {
+        _loop();
+      }
+
+      return callbacks;
+    }
+
+    return null;
+  } // Event Listeners
+
+  /**
    * Adds or removes all the event listeners to container.
+   * Uses `createButtonsCallbacks()` to create the button callbacks and
+   * appends them to `eventCallbacks`.
    *
    * @function
    *
    * @param {boolean} [forceFigures=false] Determines if the update must be forced.
    * Useful when MutationObserver isn't supported.
+   *
+   * @see createButtonsCallbacks
+   * @see eventCallbacks
    *
    * @private
    */
@@ -700,27 +771,41 @@ function FigureGallery(_ref) {
     if (openable) {
       // Click on the gallery
       container.addEventListener('click', eventCallbacks.containerClick, false);
-      overlay.addEventListener('click', eventCallbacks.dialogClick, false);
 
       if (forceFigures || !mutation) {
         figures.forEach(function (figure) {
           figure.addEventListener('click', eventCallbacks.figureClick, false);
         });
-      } // Keyboard navigation
+      }
 
+      overlay.addEventListener('click', eventCallbacks.dialogClick, false); // Keyboard navigation
 
       document.addEventListener('keydown', eventCallbacks.keyboardNavigation); // Swipe navigation - since 1.1.0
 
       if (swipeHandler) {
+        swipeHandler.attach();
         /**
          * @listens SwipeEvent#swipe
          * @see {@link https://github.com/dencreativityspace/swipe-event|SwipeEvent}
          */
-        swipeHandler.attach();
+
         document.addEventListener('swipe', eventCallbacks.swipeNavigation);
       }
 
-      window.addEventListener('resize', eventCallbacks.resize);
+      window.addEventListener('resize', eventCallbacks.resize); // Binds the overlay buttons to the public methods
+
+      if (overlay) {
+        if (!eventCallbacks.buttons) {
+          eventCallbacks.buttons = createButtonsCallbacks();
+        }
+
+        var _arr2 = Object.keys(overlay.buttons);
+
+        for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
+          var type = _arr2[_i2];
+          overlay.buttons[type].addEventListener('click', eventCallbacks.buttons[type], false);
+        }
+      }
     } else {
       container.removeEventListener('click', eventCallbacks.containerClick, false);
       overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
@@ -735,28 +820,24 @@ function FigureGallery(_ref) {
       }
 
       window.removeEventListener('resize', eventCallbacks.resize);
+
+      if (overlay) {
+        var _arr3 = Object.keys(overlay.buttons);
+
+        for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
+          var _type = _arr3[_i3];
+
+          overlay.buttons[_type].removeEventListener('click', eventCallbacks.buttons[_type], false);
+        }
+      }
     }
 
     return setListenersFn;
-  }(true); // Binds the overlay buttons to the public methods
-
-
-  var _arr = Object.keys(overlay.buttons);
-
-  var _loop = function _loop() {
-    var type = _arr[_i];
-    overlay.buttons[type].addEventListener('click', function (e) {
-      e.stopImmediatePropagation();
-      that[type]();
-    }, false);
-  };
-
-  for (var _i = 0; _i < _arr.length; _i++) {
-    _loop();
-  }
+  }(true);
   /**
    * Will contain MutationObserver instance if supported.
    *
+   * @constant
    * @type {MutationObserver|null}
    *
    * @private
@@ -977,7 +1058,7 @@ function FigureGallery(_ref) {
 
 
   this.set = function (figure) {
-    if (!figure) {
+    if (figure == null) {
       throw new Error('The given element is not a valid value. Please, insert an integer or a DOM element.');
     }
 
@@ -1060,14 +1141,12 @@ function FigureGallery(_ref) {
     if (typeof window.CustomEvent !== 'function') {
       closedEvent = document.createEvent('fig-gallery:closed');
       closedEvent.initCustomEvent('fig-gallery:closed', false, false, {
-        current: current,
-        active: that.getActiveFigure()
+        current: current
       });
     } else {
       closedEvent = new CustomEvent('fig-gallery:closed', {
         detail: {
-          current: current,
-          active: that.getActiveFigure()
+          current: current
         }
       });
     }
@@ -1097,20 +1176,30 @@ function FigureGallery(_ref) {
 
 
   this.setOpenable = function (val) {
-    if (typeof val !== 'boolean') {
+    if (!val || typeof val !== 'boolean') {
       throw new Error('The value must be a boolean.');
     }
 
     if (val !== openable) {
       openable = val;
 
-      if (mutation) {
-        if (val) {
+      if (val) {
+        overlay = createOverlay();
+
+        if (mutation) {
           mutation.observe(container, {
             childList: true
           });
-        } else {
+        }
+      } else {
+        overlay = null;
+
+        if (mutation) {
           mutation.disconnect();
+        }
+
+        if (overlay) {
+          container.removeChild(overlay);
         }
       }
 
@@ -1203,7 +1292,7 @@ function FigureGallery(_ref) {
   /**
    * Returns the current figure element.
    *
-   * @return  {HTMLElement}
+   * @return  {HTMLElement|null}
   */
 
 
@@ -1213,17 +1302,17 @@ function FigureGallery(_ref) {
   /**
    * Returns the current figure element in the overlay.
    *
-   * @return  {HTMLElement}
+   * @return  {HTMLElement|null}
    */
 
 
   this.getActiveFigure = function () {
-    return overlay.content;
+    return overlay.content.querySelector('figure');
   };
   /**
    * Returns the content of the current figure element in the overlay.
    *
-   * @return  {HTMLElement}
+   * @return  {HTMLElement|null}
    */
 
 
@@ -1242,19 +1331,19 @@ function FigureGallery(_ref) {
   };
 }
 
-var BUTTON_CONTAINER_PLACEMENT_POLICY = {
+window.BUTTON_CONTAINER_PLACEMENT_POLICY = {
   OUTSIDE_CONTENT: 'OUTSIDE_CONTENT',
   INSIDE_CONTENT: 'INSIDE_CONTENT'
 };
-Object.freeze(BUTTON_CONTAINER_PLACEMENT_POLICY);
-var BUTTON_PLACEMENT_POLICY = {
+Object.freeze(window.BUTTON_CONTAINER_PLACEMENT_POLICY);
+window.BUTTON_PLACEMENT_POLICY = {
   ALL: 'ALL',
   NAVIGATORS_ONLY: 'NAVIGATORS_ONLY',
   CLOSE_ONLY: 'CLOSE_ONLY'
 };
-Object.freeze(BUTTON_PLACEMENT_POLICY);
-var RESIZE_POLICY = {
+Object.freeze(window.BUTTON_PLACEMENT_POLICY);
+window.RESIZE_POLICY = {
   CONTENT: 'CONTENT',
   CONTAINER: 'CONTAINER'
 };
-Object.freeze(RESIZE_POLICY);
+Object.freeze(window.RESIZE_POLICY);
