@@ -37,11 +37,11 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.7.3
+ * @version 1.7.4
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, buttonsOrder = ['prev', 'next', 'close'], cycle = true, overlaySelectors = {}, swipe = false, openable = true, throwsOpenIndexError = false, resizePolicy = RESIZE_POLICY.CONTENT, buttonPlacementPolicy = BUTTON_PLACEMENT_POLICY.ALL, buttonContainerPlacementPolicy = BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT}) {
+function FigureGallery({container = '#gallery', gallerySelector = '.gallery', openSelector = '.open', currentSelector = '.current', buttonContainerSelector = null, buttonSelectors = {}, buttonContents = {}, buttonsOrder = ['prev', 'next', 'close'], cycle = true, overlaySelectors = {}, swipe = false, openable = true, throwsOpenIndexError = false, resizePolicy = RESIZE_POLICY.CONTENT, buttonPlacementPolicy = BUTTON_PLACEMENT_POLICY.ALL, buttonContainerPlacementPolicy = BUTTON_CONTAINER_PLACEMENT_POLICY.OUTSIDE_CONTENT} = {}) {
     // Type-checks
     if (typeof container === 'string') {
         container = document.querySelector(container);
@@ -162,27 +162,27 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     let dialogCache = null;
 
     /**
-    * Represents the overlay element.
-    *
-    * @type {HTMLDialogElement|HTMLDivElement}
-    *
-    * @property {object} buttons - Contains the buttons contained in the overlay.
-    * @property {HTMLElement} content - Contains the content container.
-    * @method content.getContent() - Gets the content of overlay.content.
-    *
-    * @private
-    *
-    * @see createOverlay
-    */
+     * Represents the overlay element.
+     *
+     * @type {HTMLDialogElement|HTMLDivElement}
+     *
+     * @property {object} buttons - Contains the buttons contained in the overlay.
+     * @property {HTMLElement} content - Contains the content container.
+     * @method content.getContent() - Gets the content of overlay.content.
+     *
+     * @private
+     *
+     * @see createOverlay
+     */
     let overlay = createOverlay();
 
     /**
-    * Represents the current element in container.
-    *
-    * @type {HTMLElement}
-    *
-    * @private
-    */
+     * Represents the current element in container.
+     *
+     * @type {HTMLElement}
+     *
+     * @private
+     */
     let current = (() => {
         for (const figure of figures) {
             if (figure.classList.contains(currentClass)) {
@@ -194,14 +194,14 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     })();
 
     /**
-    * Contains the swipe handler if SwipeEvent is present.
-    *
-    * @type {SwipeEvent|null}
-    *
-    * @private
-    *
-    * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
-    */
+     * Contains the swipe handler if SwipeEvent is present.
+     *
+     * @type {SwipeEvent|null}
+     *
+     * @private
+     *
+     * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+     */
     const swipeHandler = (() => {
         if (swipe && typeof SwipeEvent === 'function') {
             return new SwipeEvent({
@@ -215,12 +215,12 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     })();
 
     /**
-    * Stores the callbacks for the events.
-    *
-    * @type {object}
-    *
-    * @private
-    */
+     * Stores the callbacks for the events.
+     *
+     * @type {object}
+     *
+     * @private
+     */
     const eventCallbacks = {
         containerClick: () => {
             if (!that.isOpen()) {
@@ -696,7 +696,9 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
                 });
             }
 
-            overlay.addEventListener('click', eventCallbacks.dialogClick, false);
+            if (overlay) {
+                overlay.addEventListener('click', eventCallbacks.dialogClick, false);
+            }
 
             // Keyboard navigation
             document.addEventListener('keydown', eventCallbacks.keyboardNavigation);
@@ -727,7 +729,9 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         else {
             container.removeEventListener('click', eventCallbacks.containerClick, false);
 
-            overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
+            if (overlay) {
+                overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
+            }
 
             figures.forEach((figure) => {
                 figure.removeEventListener('click', eventCallbacks.figureClick, false);
@@ -808,7 +812,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      *
      * @throws Will throw an error if `throwsOpenIndexError` is set to `true`
      * and the given index is out of bound.
-    */
+     */
     this.open = (index = 0) => {
         if (index == null) {
             index = getFigureIndex(current);
@@ -841,9 +845,9 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         if (typeof window.CustomEvent !== 'function') {
             openedEvent = document.createEvent('fig-gallery:opened');
 
-             openedEvent.initCustomEvent('fig-gallery:opened', false, false, {
-                 current: current,
-                 active: that.getActiveFigure()
+            openedEvent.initCustomEvent('fig-gallery:opened', false, false, {
+                current: current,
+                active: that.getActiveFigure()
             });
         }
         else {
@@ -876,7 +880,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @emits FigureGallery#fig-gallery:prev
      *
      * @return  {this}
-    */
+     */
     this.prev = (cycleState = cycle) => {
         const oldCurrent = current;
 
@@ -887,10 +891,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         if (typeof window.CustomEvent !== 'function') {
             prevEvent = document.createEvent('fig-gallery:prev');
 
-             prevEvent.initCustomEvent('fig-gallery:prev', false, false, {
-                 current: current,
-                 next: oldCurrent,
-                 active: that.getActiveFigure()
+            prevEvent.initCustomEvent('fig-gallery:prev', false, false, {
+                current: current,
+                next: oldCurrent,
+                active: that.getActiveFigure()
             });
         }
         else {
@@ -925,7 +929,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @emits FigureGallery#fig-gallery:next
      *
      * @return  {this}
-    */
+     */
     this.next = (cycleState = cycle) => {
         const oldCurrent = current;
 
@@ -936,10 +940,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         if (typeof window.CustomEvent !== 'function') {
             nextEvent = document.createEvent('fig-gallery:next');
 
-             nextEvent.initCustomEvent('fig-gallery:next', false, false, {
-                 current: current,
-                 prev: oldCurrent,
-                 active: that.getActiveFigure()
+            nextEvent.initCustomEvent('fig-gallery:next', false, false, {
+                current: current,
+                prev: oldCurrent,
+                active: that.getActiveFigure()
             });
         }
         else {
@@ -981,7 +985,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @throws Will throw an error if the argument isn't a child of the container.
      * @throws Will throw an error if `throwsOpenIndexError` is set to true and if the user tries to go beyond the end-points.
      * @throws Will throw an error if the argument isn't a valid element.
-    */
+     */
     this.set = (figure) => {
         if (figure == null) {
             throw new Error('The given element is not a valid value. Please, insert an integer or a DOM element.');
@@ -1018,10 +1022,10 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         if (typeof window.CustomEvent !== 'function') {
             settedEvent = document.createEvent('fig-gallery:setted');
 
-             settedEvent.initCustomEvent('fig-gallery:setted', false, false, {
-                 current: current,
-                 old: oldCurrent,
-                 active: that.getActiveFigure()
+            settedEvent.initCustomEvent('fig-gallery:setted', false, false, {
+                current: current,
+                old: oldCurrent,
+                active: that.getActiveFigure()
             });
         }
         else {
@@ -1054,7 +1058,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @emits FigureGallery#fig-gallery:closed
      *
      * @return  {this}
-    */
+     */
     this.close = () => {
         if (overlay) {
             if ('HTMLDialogElement' in window && overlay instanceof HTMLDialogElement) {
@@ -1074,7 +1078,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         if (typeof window.CustomEvent !== 'function') {
             closedEvent = document.createEvent('fig-gallery:closed');
 
-             closedEvent.initCustomEvent('fig-gallery:closed', false, false, {
+            closedEvent.initCustomEvent('fig-gallery:closed', false, false, {
                 current: current
             });
         }
@@ -1108,7 +1112,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {this}
      *
      * @throws Will throw an error if the argument is null or isn't a boolean.
-    */
+     */
     this.setOpenable = (val) => {
         if (!val || typeof val !== 'boolean') {
             throw new Error('The value must be a boolean.');
@@ -1143,7 +1147,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             if (typeof window.CustomEvent !== 'function') {
                 openablechangeEvent = document.createEvent('fig-gallery:openablechange');
 
-                 openablechangeEvent.initCustomEvent('fig-gallery:openablechange', false, false, {
+                openablechangeEvent.initCustomEvent('fig-gallery:openablechange', false, false, {
                     openable: val
                 });
             }
@@ -1176,7 +1180,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      *                                      updated too.
      *
      * @return  {this}
-    */
+     */
     this.updateFigures = (events = true) => {
         figures = container.querySelectorAll('figure');
 
@@ -1197,7 +1201,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * Tells if the the overlay is open or not.
      *
      * @return  {boolean}
-    */
+     */
     this.isOpen = () => {
         return container.classList.contains(openClass);
     };
@@ -1206,7 +1210,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * Tells if the the overlay is able to be open or not.
      *
      * @return  {boolean}
-    */
+     */
     this.isOpenable = () => {
         return openable;
     };
@@ -1215,7 +1219,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * Returns the container element.
      *
      * @return  {HTMLElement}
-    */
+     */
     this.getContainer = () => {
         return container;
     };
@@ -1224,7 +1228,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * Returns the current figure element.
      *
      * @return  {HTMLElement|null}
-    */
+     */
     this.getCurrentFigure = () => {
         return current;
     };
@@ -1235,7 +1239,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {HTMLElement|null}
      */
     this.getActiveFigure = () => {
-        return overlay.content.querySelector('figure');
+        if (overlay) {
+            return overlay.content.querySelector('figure');
+        }
+
+        return null;
     };
 
     /**
@@ -1244,7 +1252,11 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @return  {HTMLElement|null}
      */
     this.getActiveContent = () => {
-        return overlay.getContent();
+        if (overlay) {
+            return overlay.getContent();
+        }
+
+        return null;
     };
 
     /**

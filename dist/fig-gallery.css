@@ -4,7 +4,11 @@
 .gallery figure {
   box-sizing: border-box;
 }
-.gallery figure img {
+.gallery figure img,
+.gallery figure video,
+.gallery figure object,
+.gallery figure embed,
+.gallery figure iframe {
   width: 100%;
   height: 100%;
 }

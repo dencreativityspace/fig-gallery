@@ -39,14 +39,15 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.7.3
+ * @version 1.7.4
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
-function FigureGallery(_ref) {
+function FigureGallery() {
   var _this = this;
 
-  var _ref$container = _ref.container,
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _ref$container = _ref.container,
       container = _ref$container === void 0 ? '#gallery' : _ref$container,
       _ref$gallerySelector = _ref.gallerySelector,
       gallerySelector = _ref$gallerySelector === void 0 ? '.gallery' : _ref$gallerySelector,
@@ -206,27 +207,27 @@ function FigureGallery(_ref) {
 
   var dialogCache = null;
   /**
-  * Represents the overlay element.
-  *
-  * @type {HTMLDialogElement|HTMLDivElement}
-  *
-  * @property {object} buttons - Contains the buttons contained in the overlay.
-  * @property {HTMLElement} content - Contains the content container.
-  * @method content.getContent() - Gets the content of overlay.content.
-  *
-  * @private
-  *
-  * @see createOverlay
-  */
+   * Represents the overlay element.
+   *
+   * @type {HTMLDialogElement|HTMLDivElement}
+   *
+   * @property {object} buttons - Contains the buttons contained in the overlay.
+   * @property {HTMLElement} content - Contains the content container.
+   * @method content.getContent() - Gets the content of overlay.content.
+   *
+   * @private
+   *
+   * @see createOverlay
+   */
 
   var overlay = createOverlay();
   /**
-  * Represents the current element in container.
-  *
-  * @type {HTMLElement}
-  *
-  * @private
-  */
+   * Represents the current element in container.
+   *
+   * @type {HTMLElement}
+   *
+   * @private
+   */
 
   var current = function () {
     var _iteratorNormalCompletion = true;
@@ -259,14 +260,14 @@ function FigureGallery(_ref) {
     return figures[0] || null;
   }();
   /**
-  * Contains the swipe handler if SwipeEvent is present.
-  *
-  * @type {SwipeEvent|null}
-  *
-  * @private
-  *
-  * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
-  */
+   * Contains the swipe handler if SwipeEvent is present.
+   *
+   * @type {SwipeEvent|null}
+   *
+   * @private
+   *
+   * @see {@link https://github.com/dencreativityspace/swipe-event|swipe-event}
+   */
 
 
   var swipeHandler = function () {
@@ -281,12 +282,12 @@ function FigureGallery(_ref) {
     return null;
   }();
   /**
-  * Stores the callbacks for the events.
-  *
-  * @type {object}
-  *
-  * @private
-  */
+   * Stores the callbacks for the events.
+   *
+   * @type {object}
+   *
+   * @private
+   */
 
 
   var eventCallbacks = {
@@ -778,7 +779,10 @@ function FigureGallery(_ref) {
         });
       }
 
-      overlay.addEventListener('click', eventCallbacks.dialogClick, false); // Keyboard navigation
+      if (overlay) {
+        overlay.addEventListener('click', eventCallbacks.dialogClick, false);
+      } // Keyboard navigation
+
 
       document.addEventListener('keydown', eventCallbacks.keyboardNavigation); // Swipe navigation - since 1.1.0
 
@@ -808,7 +812,11 @@ function FigureGallery(_ref) {
       }
     } else {
       container.removeEventListener('click', eventCallbacks.containerClick, false);
-      overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
+
+      if (overlay) {
+        overlay.removeEventListener('click', eventCallbacks.dialogClick, false);
+      }
+
       figures.forEach(function (figure) {
         figure.removeEventListener('click', eventCallbacks.figureClick, false);
       });
@@ -886,7 +894,7 @@ function FigureGallery(_ref) {
    *
    * @throws Will throw an error if `throwsOpenIndexError` is set to `true`
    * and the given index is out of bound.
-  */
+   */
 
 
   this.open = function () {
@@ -953,7 +961,7 @@ function FigureGallery(_ref) {
    * @emits FigureGallery#fig-gallery:prev
    *
    * @return  {this}
-  */
+   */
 
 
   this.prev = function () {
@@ -1000,7 +1008,7 @@ function FigureGallery(_ref) {
    * @emits FigureGallery#fig-gallery:next
    *
    * @return  {this}
-  */
+   */
 
 
   this.next = function () {
@@ -1054,7 +1062,7 @@ function FigureGallery(_ref) {
    * @throws Will throw an error if the argument isn't a child of the container.
    * @throws Will throw an error if `throwsOpenIndexError` is set to true and if the user tries to go beyond the end-points.
    * @throws Will throw an error if the argument isn't a valid element.
-  */
+   */
 
 
   this.set = function (figure) {
@@ -1121,7 +1129,7 @@ function FigureGallery(_ref) {
    * @emits FigureGallery#fig-gallery:closed
    *
    * @return  {this}
-  */
+   */
 
 
   this.close = function () {
@@ -1172,7 +1180,7 @@ function FigureGallery(_ref) {
    * @return  {this}
    *
    * @throws Will throw an error if the argument is null or isn't a boolean.
-  */
+   */
 
 
   this.setOpenable = function (val) {
@@ -1240,7 +1248,7 @@ function FigureGallery(_ref) {
    *                                      updated too.
    *
    * @return  {this}
-  */
+   */
 
 
   this.updateFigures = function () {
@@ -1263,7 +1271,7 @@ function FigureGallery(_ref) {
    * Tells if the the overlay is open or not.
    *
    * @return  {boolean}
-  */
+   */
 
 
   this.isOpen = function () {
@@ -1273,7 +1281,7 @@ function FigureGallery(_ref) {
    * Tells if the the overlay is able to be open or not.
    *
    * @return  {boolean}
-  */
+   */
 
 
   this.isOpenable = function () {
@@ -1283,7 +1291,7 @@ function FigureGallery(_ref) {
    * Returns the container element.
    *
    * @return  {HTMLElement}
-  */
+   */
 
 
   this.getContainer = function () {
@@ -1293,7 +1301,7 @@ function FigureGallery(_ref) {
    * Returns the current figure element.
    *
    * @return  {HTMLElement|null}
-  */
+   */
 
 
   this.getCurrentFigure = function () {
@@ -1307,7 +1315,11 @@ function FigureGallery(_ref) {
 
 
   this.getActiveFigure = function () {
-    return overlay.content.querySelector('figure');
+    if (overlay) {
+      return overlay.content.querySelector('figure');
+    }
+
+    return null;
   };
   /**
    * Returns the content of the current figure element in the overlay.
@@ -1317,7 +1329,11 @@ function FigureGallery(_ref) {
 
 
   this.getActiveContent = function () {
-    return overlay.getContent();
+    if (overlay) {
+      return overlay.getContent();
+    }
+
+    return null;
   };
   /**
    * Returns the swipe handler instance, if exists.
