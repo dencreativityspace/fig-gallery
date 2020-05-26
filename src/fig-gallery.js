@@ -37,7 +37,7 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.7.4
+ * @version 1.7.5
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -160,6 +160,15 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @private
      */
     let dialogCache = null;
+
+    /**
+     * Contains the controls container.
+     *
+     * @type {HTMLElement|null}
+     *
+     * @private
+     */
+    let buttonContainer = null;
 
     /**
      * Represents the overlay element.
@@ -462,7 +471,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             // Takes buttons or creates them.
             dialog.buttons = {};
 
-            const buttonContainer = (() => {
+            buttonContainer = (() => {
                 if (buttonContainerSelector == null) {
                     return null;
                 }
@@ -1223,6 +1232,15 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     this.getContainer = () => {
         return container;
     };
+
+    /**
+     * Returns the controls container element, if created.
+     *
+     * @return  {HTMLElement|null}
+     */
+    this.getControlsContainer = () => {
+        return buttonContainer;
+    }
 
     /**
      * Returns the current figure element.
