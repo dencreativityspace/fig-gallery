@@ -317,7 +317,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      * @private
      */
     function setImageSize(image) {
-        if (overlay) {
+        function updateImageSize() {
             const overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
 
             const ratio = Math.min(
@@ -327,13 +327,23 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
             );
 
             if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTENT) {
-                image.style.width = (image.naturalWidth * ratio) + 'px';
-                image.style.height = (image.naturalHeight * ratio) + 'px';
+                image.style.width = ((image.naturalWidth || document.body.clientWidth) * ratio) + 'px';
+                image.style.height = ((image.naturalHeight || document.body.clientHeight) * ratio) + 'px';
             }
             else if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
-                overlay.content.style.width = (image.naturalWidth * ratio) + 'px';
-                overlay.content.style.height = (image.naturalHeight * ratio) + 'px';
+                overlay.content.style.width = ((image.naturalWidth || document.body.clientWidth) * ratio) + 'px';
+                overlay.content.style.height = ((image.naturalHeight || document.body.clientHeight) * ratio) + 'px';
             }
+        }
+
+        function resizeImage() {
+            updateImageSize();
+
+            image.removeEventListener('DOMContentLoaded', resizeImage);
+        }
+
+        if (overlay && image) {
+            image.addEventListener('DOMContentLoaded', resizeImage);
         }
     }
 
@@ -1240,7 +1250,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
      */
     this.getControlsContainer = () => {
         return buttonContainer;
-    }
+    };
 
     /**
      * Returns the current figure element.
