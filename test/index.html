@@ -4,7 +4,7 @@
         <title>FigureGallery - Test</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link rel="stylesheet" href="../fig-gallery.css">
+        <link rel="stylesheet" href="../dist/fig-gallery.css">
     </head>
     <body>
         <div id="gallery-1" class="gallery">
@@ -36,9 +36,9 @@
             </figure>
         </div>
 
-        <script src="../fig-gallery.js"></script>
+        <script src="../src/fig-gallery.js"></script>
         <script>
-            var gallery = new FigureGallery({
+            const gallery = new FigureGallery({
                 container: document.getElementById('gallery-1'),
                 openable: false,
                 buttonPlacementPolicy: 'NAVIGATORS_ONLY',

@@ -39,7 +39,7 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.7.4
+ * @version 1.7.5
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -206,6 +206,15 @@ function FigureGallery() {
    */
 
   var dialogCache = null;
+  /**
+   * Contains the controls container.
+   *
+   * @type {HTMLElement|null}
+   *
+   * @private
+   */
+
+  var buttonContainer = null;
   /**
    * Represents the overlay element.
    *
@@ -385,17 +394,26 @@ function FigureGallery() {
 
 
   function setImageSize(image) {
-    if (overlay) {
+    function updateImageSize() {
       var overlayContentStyle = overlay.content.currentStyle || window.getComputedStyle(overlay.content);
       var ratio = Math.min(1, (overlay.clientWidth - (parseFloat(overlayContentStyle.marginLeft) + parseFloat(overlayContentStyle.marginRight))) / image.naturalWidth, (overlay.clientHeight - (parseFloat(overlayContentStyle.marginTop) + parseFloat(overlayContentStyle.marginBottom))) / image.naturalHeight);
 
       if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTENT) {
-        image.style.width = image.naturalWidth * ratio + 'px';
-        image.style.height = image.naturalHeight * ratio + 'px';
+        image.style.width = (image.naturalWidth || document.body.clientWidth) * ratio + 'px';
+        image.style.height = (image.naturalHeight || document.body.clientHeight) * ratio + 'px';
       } else if (resizePolicy.toUpperCase() === RESIZE_POLICY.CONTAINER) {
-        overlay.content.style.width = image.naturalWidth * ratio + 'px';
-        overlay.content.style.height = image.naturalHeight * ratio + 'px';
+        overlay.content.style.width = (image.naturalWidth || document.body.clientWidth) * ratio + 'px';
+        overlay.content.style.height = (image.naturalHeight || document.body.clientHeight) * ratio + 'px';
       }
+    }
+
+    function resizeImage() {
+      updateImageSize();
+      image.removeEventListener('DOMContentLoaded', resizeImage);
+    }
+
+    if (overlay && image) {
+      image.addEventListener('DOMContentLoaded', resizeImage);
     }
   }
   /**
@@ -523,7 +541,7 @@ function FigureGallery() {
 
       dialog.buttons = {};
 
-      var buttonContainer = function () {
+      buttonContainer = function () {
         if (buttonContainerSelector == null) {
           return null;
         }
@@ -1298,7 +1316,17 @@ function FigureGallery() {
     return container;
   };
   /**
-   * Returns the current figure element.
+   * Returns the controls container element, if created.
+   *
+   * @return  {HTMLElement|null}
+   */
+
+
+  this.getControlsContainer = function () {
+    return buttonContainer;
+  };
+  /**
+   * Returns the current figure element outside of the overlay.
    *
    * @return  {HTMLElement|null}
    */

@@ -1253,7 +1253,7 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
     };
 
     /**
-     * Returns the current figure element.
+     * Returns the current figure element outside of the overlay.
      *
      * @return  {HTMLElement|null}
      */
