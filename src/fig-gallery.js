@@ -37,7 +37,7 @@
  * @throws Will throw an error if the `resizePolicy` is invalid.
  * @throws Will throw an error if the `buttonsOrder` doesn't include all the buttons.
  *
- * @version 1.7.5
+ * @version 1.7.6
  *
  * @author Gennaro Landolfi <gennarolandolfi@codedwork.it>
  */
@@ -339,11 +339,16 @@ function FigureGallery({container = '#gallery', gallerySelector = '.gallery', op
         function resizeImage() {
             updateImageSize();
 
-            image.removeEventListener('DOMContentLoaded', resizeImage);
+            image.removeEventListener('load', resizeImage);
         }
 
         if (overlay && image) {
-            image.addEventListener('DOMContentLoaded', resizeImage);
+            if (image.complete) {
+                updateImageSize();
+            }
+            else {
+                image.addEventListener('load', resizeImage);
+            }
         }
     }
 
